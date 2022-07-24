@@ -1,0 +1,28 @@
+/*-- scss:defaults --*/
+$body-bg: #151715;
+$navbar-bg: #332e2f;
+$navbar-fg: #e5fee0;
+$navbar-hover-color: #eccd37;
+$body-color: #f9faf5;
+$code-block-bg: lighten(#000, 20%) !default;
+$sidebarTextColorDark: #e5fee0;
+$headlineColorDark: #a4c993;
+$headingColorDark: #a4c993;
+$bodyLinkColorDark: #eccd37;
+$navLinkColorDark: #eccd37;
+$sidebarLinkColorDark: #e5bb67;
+$footerTextColorDark: #a4c993;
+$buttonTextColorDark: #cee4cf;
+$buttonHoverTextColorDark: #151715;
+$buttonBgColorDark: #ffffff;
+$buttonHoverBgColorDark: #eccd37;
+$borderColorDark: #cee4cf;
+/*-- scss:rules --*/
+h3, .quarto-category {
+  color: $navLinkColorDark;
+}
+
+div.quarto-post .listing-categories .listing-category{
+  color: lighten($navLinkColorDark, 30%);
+  border-color: lighten($navLinkColorDark, 20%);
+}
