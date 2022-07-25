@@ -31,3 +31,7 @@
     left: 15px;
     background-size: contain;
 }
+
+.navbar-brand>a {
+  href: "tsostarics.com"
+}

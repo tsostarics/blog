@@ -4,15 +4,17 @@ project:
 website:
   navbar:
     title: false
-    logo: "house-solid.svg"
     collapse-below: sm
+    left:
+      - icon: house-door
+        href: https://tsostarics.com/
     right:
       - text: ABOUT
-        href: https://google.com
+        href: https://www.tsostarics.com/about/
       - text: POSTS
-        href: https://facebook.com
+        href: https://tsostaricsblog.netlify.app
       - text: RESEARCH
-        href: https://twitter.com
+        href: https://www.tostarics.com/research/
   comments:
     utterances:
       repo: tsostarics/blog
@@ -28,7 +30,7 @@ website:
         aria-label: Twitter
     right:
       - text: "Contact"
-        href: https://google.com
+        href: https://www.tsostarics.com/contact/
 format:
   html:
     theme:
