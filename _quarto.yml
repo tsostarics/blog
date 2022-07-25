@@ -14,7 +14,7 @@ website:
       - text: POSTS
         href: https://tsostaricsblog.netlify.app
       - text: RESEARCH
-        href: https://www.tostarics.com/research/
+        href: https://www.tsostarics.com/research/
   comments:
     utterances:
       repo: tsostarics/blog
