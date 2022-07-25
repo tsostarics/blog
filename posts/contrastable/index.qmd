@@ -1,0 +1,494 @@
+---
+title: "Contrastable"
+author: "Thomas Sostarics"
+date: '2022-07-13'
+editor: source
+description: "This post gives an overview of an R package I've written. The contrastable package provides a tidy approach to contrast coding for regression analyses."
+bibliography: mybib.bib
+categories: ['R pkg']
+code-tools: false
+code-fold: 'show'
+execute:
+  message: false
+  echo: true
+---
+
+
+I've been working on a package called `contrastable` on and off for the past
+year or so.
+The package's goal is to provide a tidy approach to setting factor contrasts
+for regression analysis.
+While this can be done with repeated `contrasts<-` calls, this workflow
+is tedious when working with multiple factors and especially error-prone
+when manually specifying contrast matrices to use.
+In this latter case, the user would need to be careful to specify the correct
+fractions in the correct order with the correct signs, which can be a lot to
+keep track of.
+These issues quickly become apparent when the number of factor levels is
+greater than 2.
+In this post I will:
+
+- Run through an example of a typical contrast coding workflow using `contrasts<-`.
+I will give an example of an error that can arise due to a typo, and show
+how to diagnose what this error actually reflects by checking the hypothesis
+matrix.
+- Show how the `contrastable` package can be used to sidestep mistakes caused
+by error-prone and tedious calls to `contrasts<-`.
+- Briefly link to other packages on contrasts and level comparisons.
+
+::: {.callout-tip}
+## Where to find contrastable
+
+You can find the `contrastable` package on my Github at this repo: [tsostarics/contrastable](https://github.com/tsostarics/contrastable)
+You can install it like so:
+
+```{r}
+#| eval: false
+#| code-fold: false
+devtools::install_github('tsostarics/contrastable')
+remotes::install_github('tsostarics/contrastable')
+```
+
+:::
+
+## Contrasts overview
+
+Contrast coding refers to assigning numeric values to levels of a categorical 
+variable for use in regression analyses.
+Depending on the numbers used, different comparisons can be made between the
+group means of a variable.
+These comparisons can correspond to particular null hypotheses that a
+researcher might have, and particular combinations of numbers can encode
+high-level questions like "Are there differences between levels when compared
+to a common reference level?" or "Does each level differ from the levels
+that came before it?"
+Critically, the contrasts used don't impact the model fit but do impact the
+coefficient estimates that are used to make inferences about the data.
+
+In most cases in Linguistics, people tend to want pairwise comparisons while
+retaining main effects in their model; e.g., the main effect of speech rate
+on intelligibility when L1 vs L2 speakers are considered as a categorical fixed
+effect.
+Many people realize (or are starting to at least) that the default
+"0/1 contrasts" (aka treatment or dummy coding) will only give them the simple
+effect of intelligibility; that is, the effect of intelligibility for just the
+L1 group.
+To rectify this, researchers will opt for "the +.5/-.5 contrasts" to obtain
+main effects.
+
+
+:::{.callout-warning}
+## Warning: Naming inconsistency
+
+The name for this contrast scheme is *not consistent*, especially in the
+2-level case where the values are +.5/-.5.
+I've seen it called sum coding, simple coding, effects coding, scaled sum 
+coding, helmert coding, difference coding, contrast coding, sum-to-zero coding,
+and +.5/-.5 coding.
+See @brehm2022
+for concerns about transparent descriptions of contrast coding schemes.
+:::
+
+While researchers may differ on what they call +.5/-.5, for 2 levels the result
+is nonetheless the same.
+But, a researcher using "helmert coding" and a researcher using "scaled sum
+coding" for a factor with 3 or more levels will be using very different
+contrast matrices, and thus address very different research questions
+about the data.
+Let's use some functions from `contrastable` to look at how these contrast
+matrices differ.
+
+```{r}
+#| code-fold: false
+library(contrastable)
+```
+
+::: {.panel-tabset}
+
+## 2 levels
+
+```{r}
+#| code-fold: false
+helmert_code(2) |> MASS::fractions()
+scaled_sum_code(2) |> MASS::fractions()
+```
+
+## 3 levels
+
+```{r}
+#| code-fold: false
+helmert_code(3) |> MASS::fractions()
+scaled_sum_code(3) |> MASS::fractions()
+```
+
+## 5 levels
+```{r}
+#| code-fold: false
+helmert_code(5) |> MASS::fractions()
+scaled_sum_code(5) |> MASS::fractions()
+```
+
+:::
+
+Note that I use the term *scaled sum coding* for the "pairwise comparisons with
+main effects" contrast scheme.
+I opt for this term for three reasons.
+
+ - First, I see sum coding used more frequently in statistics and econometrics to refer
+to +1/-1; this is also what `contr.sum` in R returns.
+ - Second, the salient part of going from sum coding to scaled sum coding, especially
+in the 2-level case, is that there's some kind of division or scaling operation
+involved; I frequently see people use `contr.sum(2)/2`, although importantly
+`contr.sum(3)/3` does not yield the expected result.
+ - Third, "simple" coding is counterintuitive to me since we're trying to *avoid* 
+"simple effects;" "effects coding" and "contrast coding" are largely meaningless
+as all coding schemes will encode some kind of effect, and setting *any*
+contrast matrix is an instance of contrast coding.
+
+So, for the researcher trying to remember "I need to use *those* contrasts
+where they're divided to get the main effects", it (to me) seems easy to
+reach for a tool where *scaled* is in the name and is clearly distinguished
+from sum coding. [^namenote]
+
+[^namenote]: If it were really up to me, I would call it "centered pairwise coding" since
+you get pairwise comparisons with the intercept centered on the grand mean,
+but it doesn't quite roll off the tongue and it's a bit wordy to type out.
+
+## Typical approach to contrast coding
+
+Typically when I see people in Linguistics set contrasts, they
+do something like the following, using the `palmerpenguins` dataset as an 
+example.
+
+```{r}
+#| message: false
+#| warning: false
+library(tidyverse)
+library(palmerpenguins)
+penguins_with_contrasts <- penguins
+
+# Default treatment/dummy coding for a 2 and 3 level factor
+contrasts(penguins_with_contrasts$sex)
+contrasts(penguins_with_contrasts$species)
+
+# Easy enough for 2 levels, -contr.sum(2)/2 is also used a lot
+contrasts(penguins_with_contrasts$sex) <- c(-.5, .5) 
+
+# Not so fun for three levels!
+contrasts(penguins_with_contrasts$species) <- matrix(c(-1/3, 2/3, -1/3,
+                                                       -1/3, -1/3, 2/3),
+                                                     nrow = 3)
+```
+
+The chance of making a mistake increases when including more and more
+categorical variables.
+Catching these mistakes can be very difficult, in part because this workflow
+erases the labels in the regression output.
+This means you have to keep track of what `1` and `2` in the regression
+coefficients correspond to.
+
+::: {.callout-note}
+## Note: Column/Comparison/Coefficient names
+
+While the `dimnames` argument can be used to set the labels, anecdotally
+I rarely see people use this in their analyses when perusing code on the osf. 
+@winter2019 [p. 127] notes that "Using the '1' after the predictor name is a notational
+convention for representing the slopes of sum-coded predictors in R" but this is
+slightly incorrect; in the absence of `dimnames` being set, R will use the
+numeric indices of the contrast matrix's columns (no matter what the scheme is).
+
+:::
+
+Below, the two sets of coefficients represent pairwise comparisons to
+the `Adelie` baseline, but the intercepts differ due to how the contrasts
+are set, with the first using treatment coding and the second using
+scaled sum coding.
+I'll start with a case that only considers the categorical variable,
+but will include an additional continuous independent variable later on.
+
+
+```{r}
+# Compare the default treatment coding with the penguins dataset
+# with the contrasts we specified in penguins_with_contrasts
+coef(lm(bill_length_mm ~ species, data = penguins))    
+coef(lm(bill_length_mm ~ species, data = penguins_with_contrasts)) 
+```
+
+Had we made a mistake in the manually-set contrast matrix, we would reach
+an incorrect conclusion about the difference between groups.
+
+```{r}
+# What if we accidentally typed 1/3 instead of 2/3?
+contrasts(penguins_with_contrasts$species) <- matrix(c(-1/3, 1/3, -1/3,
+                                                       -1/3, -1/3, 2/3),
+                                                     nrow = 3)
+coef(lm(bill_length_mm ~ species, data = penguins_with_contrasts))
+```
+
+Here we can see that the intercept and the value for `species1` has changed.
+To what though??
+What does the new coefficient estimate represent?
+
+### Diagnosing our mistake
+
+
+To check what these numbers correspond to, we have to check the
+*hypothesis matrix* that corresponds to our *contrast matrix*.
+The process of obtaining the hypothesis matrix has been referred to as finding
+the generalized inverse of the contrast matrix [see @schad2020 for details].
+
+```{r}
+matrix(c(1, 1, 1,         # Add a column of 1s for the intercept
+         -1/3, 1/3, -1/3,
+         -1/3, -1/3, 2/3),
+       nrow = 3,
+       dimnames = list(NULL, c('Intercept', 'species1', 'species2'))) |> 
+  t() |> 
+  solve() |> 
+  MASS::fractions() # This function just shows numbers as fractions
+```
+
+Here the intercept is represented by the weighted sum of each group mean,
+where the weights are shown in the intercept column.
+In most cases, the intercept should reflect the grand mean, or the mean of the
+group means, and so would usually have equal weights (i.e., `1/3` here) for the
+levels.
+In this case, we see the fractional weights are not the same.
+We can verify this by calculating the weighted mean ourselves:
+
+```{r}
+group_means <- 
+  penguins |>
+  dplyr::group_by(species) |> 
+  dplyr::summarize(mean_length = mean(bill_length_mm, na.rm = TRUE)) |> 
+  purrr::pluck('mean_length') |> 
+  `names<-`(c('Adelie', 'Chinstrap', 'Gentoo'))
+
+group_means
+
+weighted.mean(group_means, c(1/6, 1/2, 1/3))
+```
+
+
+Similarly, the coefficient for `species1` shows the difference between the
+group means of levels 1 and 2 (i.e., mean of Chinstrap - mean of Adelie) but
+times a factor of `3/2`.
+Crucially, if our goal is to evaluate the difference between the means of
+these two levels, then our mistake in coding the hypothesis matrix will give
+us a larger estimate (~15 vs 10).
+Consider a similar setup where the larger estimate was 5 instead of 0; if
+we were relying on null hypothesis testing it's possible we'd get a significant
+effect when really we shouldn't have.
+
+```{r}
+(3/2 * group_means[['Chinstrap']]) - (3/2 * group_means[['Adelie']])
+group_means[['Chinstrap']] - group_means[['Adelie']]
+```
+
+Point being: we made an honest mistake of typing `1/3` instead of `2/3` but
+this had ramifications for the coefficients in our model output that we use
+to make inferences.
+In practice, because we did the multiple `contrasts<-` calls, we would likely
+assume that what we did was correct in the absence of any errors.
+
+## Tidy approach to contrasts
+
+Here I'll show a different approach using the `contrastable` package.
+This package takes a tidy approach to take care of the overhead of
+labels and reference levels involved when using common contrast coding schemes.
+Specifically, this package provides a series of functions that use a special 
+formula implementation that assigns specific meanings to each operator.
+The left hand side of the formula is the factor column whose contrasts
+you want to change.
+The right hand side consists of (at minimum) a function to generate contrast
+matrices such as `contr.treatment` or `treatment_code`.
+Additional operators provide extra optional functionality:
+
+- `+ x`: Set reference level to level `x`
+- `* x`: Set intercept to be the mean of `x`
+- `- 3:4`: For polynomial contrasts only, drop trends `3` and `4`
+- `| c("A-B", "A-C")`: Set the comparison labels to `A-B` and `A-C` (must be
+the last operator if used)
+
+Recall that in many cases researchers want pairwise comparisons while retaining
+main effects, and so the choice of reference level for the comparisons is
+very important.
+By default, R uses the first level alphabetically as the reference level,
+but sometimes we want to change this manually ourselves.
+Here's an example where we set the `sex` and `species` factors to the two
+contrast schemes we manually set before.
+The `set_contrasts` function will show a message if it detects additional
+factor variables in the dataframe that the user did not provide contrasts for.
+
+```{r}
+# library(contrastable) was loaded earlier
+penguins_df <- 
+  penguins |> 
+  set_contrasts(sex ~ scaled_sum_code + "male", # Set reference level with +
+                species ~ scaled_sum_code + 'Adelie') 
+
+contrasts(penguins_df$species) |> MASS::fractions()
+contrasts(penguins_df$sex) |> MASS::fractions()
+```
+
+`penguins_df` now has its contrasts set, and we can run our model as usual.
+Note that we didn't have to type out any matrices ourselves, but we got the
+correct contrasts that we needed.
+
+```{r}
+coef(lm(bill_length_mm ~ species + bill_depth_mm, data = penguins_df))
+```
+
+If we wanted to change the labels to better reflect the comparisons being
+made, we could do that in the formula too with the `|` operator.
+
+```{r}
+#| message: false
+penguins_df <- 
+  penguins_df |> 
+  set_contrasts(species ~ scaled_sum_code + 'Adelie' | 
+                  c('Chinstrap-Ad', 'Gentoo-Ad'))
+
+coef(lm(bill_length_mm ~ species, data = penguins_df))
+```
+
+
+### Additional functions
+
+Typically when I use this package in my analyses the `set_contrasts` function
+is all I really need, but there are other functions that follow
+the same syntax that provide other information.
+To avoid retyping things, I'll usually keep the contrasts in a list assigned
+to a separate variable and pass that to functions.
+
+The `glimpse_contrasts` function can show information about the factors
+in a dataset along with the contrast schemes that have been assigned to each 
+factor.
+
+```{r}
+my_contrasts <- 
+  list(
+    sex ~ scaled_sum_code + 'female',
+    species ~ helmert_code
+  )
+
+glimpse_contrasts(penguins_df, my_contrasts) |> gt::gt()
+```
+
+
+The `enlist_contrasts` function does the same thing as `set_contrasts`, but
+returns a list of contrast matrices that can be used in the `contrasts` 
+argument of some model-fitting functions.[^1]
+It also provides an easy way to show the contrast matrices in an appendix
+or supplementary material.
+
+[^1]: Not all modeling functions use the `contrasts` argument, `brms::brm` is 
+one example. In these cases you *must* set the contrast matrix to the factor,
+hence `set_contrasts` is typically more useful for the actual modeling part 
+while `enlist_contrasts` is useful for showing matrices.
+
+```{r}
+enlist_contrasts(penguins_df, my_contrasts) |> purrr::map(MASS::fractions)
+```
+
+### Available contrast schemes
+
+Here are the different contrast functions this package currently provides.
+
+::: {.panel-tabset}
+
+### Treatment
+
+```{r}
+# = contr.treatment
+treatment_code(5) |> MASS::fractions()
+```
+
+### Sum
+
+```{r}
+# = contr.sum
+sum_code(5) |> MASS::fractions()
+```
+
+### Scaled Sum
+
+```{r}
+# = contr.sum
+scaled_sum_code(5) |> MASS::fractions()
+```
+
+
+### Helmert
+
+```{r}
+# NOT = contr.helmert, which is unscaled
+helmert_code(5) |> MASS::fractions()
+```
+
+### Reverse Helmert
+
+```{r}
+reverse_helmert_code(5) |> MASS::fractions()
+```
+ 
+
+### Forward Difference
+
+```{r}
+forward_difference_code(5) |> MASS::fractions()
+```
+
+### Backward Difference
+
+```{r}
+backward_difference_code(5) |> MASS::fractions()
+```
+
+
+### Orthogonal Polynomials
+
+```{r}
+# = contr.poly, poly(1:n, degree = n-1, raw = FALSE)
+orth_polynomial_code(5) |> MASS::fractions()
+```
+
+### Raw Polynomials
+
+```{r}
+# = poly(1:n, degree = n-1, raw = TRUE)
+raw_polynomial_code(5) |> MASS::fractions()
+```
+
+:::
+
+## Other packages and resources
+
+This package is not the first package made for contrast coding, though to
+my knowledge it is the first to take a "tidy" approach to it.
+
+The `hypr` package [@hypr] takes a different approach, where the focus is
+on considering the hypothesis matrix and declaring *specifically* which comparisons
+you want to make, then the package can provide a corresponding matrix.
+I like `hypr` a lot actually, but I find it a bit tedious when I know what the
+contrast matrix should look like but I have to type out the comparisons; still
+better than `matrix` calls though.
+
+The `emmeans` package [@emmeans] is extremely useful for making pairwise 
+comparisons, but is capable of a lot more as well. You can see its vignette
+on contrasts [here](https://cran.r-project.org/web/packages/emmeans/vignettes/comparisons.html).
+
+The `multcomp` package [@multcomp] is useful for simultaneous inference, which
+seeks to extend workflows for multiple comparisons.
+
+I haven't used the `contrasts` package [@contrasts]
+very much, but judging from its vignette [here](https://cran.r-project.org/web/packages/contrast/vignettes/contrast.html)
+it seems like it extends the `rms` package's `contrast` function [@rms].
+It seems useful for calculating different comparisons after a model is run,
+but its usage isn't very transparent to me on first glance.
+
+While not a package, [this page from UCLA](https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/)
+pops up a lot when people discuss contrast coding.
+It's very useful, and I used it as a starting point for implementing different
+contrast functions. 
+However, I will note that I don't follow its naming conventions.

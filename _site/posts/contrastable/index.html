@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="generator" content="quarto-0.9.80">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Thomas Sostarics">
+  <meta name="dcterms.date" content="2022-07-13">
+  <meta name="description" content="This post gives an overview of an R package I’ve written. The contrastable package provides a tidy approach to contrast coding for regression analyses.">
+  <title>Contrastable</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+
+  <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+  <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+  <script src="../../site_libs/clipboard/clipboard.min.js"></script>
+  <meta name="quarto:offset" content="../../">
+  <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+  <script src="../../site_libs/quarto-search/fuse.min.js"></script>
+  <script src="../../site_libs/quarto-search/quarto-search.js"></script>
+  <script src="../../site_libs/quarto-html/quarto.js"></script>
+  <script src="../../site_libs/quarto-html/popper.min.js"></script>
+  <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="../../site_libs/quarto-html/anchor.min.js"></script>
+  <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+  <link class="quarto-color-scheme" href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
+  <link class="quarto-color-scheme quarto-color-alternate" rel="prefetch" href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css">
+  <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+  <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link class="quarto-color-scheme" href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link class="quarto-color-scheme quarto-color-alternate" rel="prefetch" href="../../site_libs/bootstrap/bootstrap-dark.min.css">
+  <script id="quarto-search-options" type="application/json">{
+    "location": "navbar",
+    "copy-button": false,
+    "collapse-after": 2,
+    "panel-placement": "end",
+    "type": "overlay",
+    "limit": 20,
+    "language": {
+      "search-no-results-text": "No results",
+      "search-matching-documents-text": "matching documents",
+      "search-copy-link-title": "Copy link to search",
+      "search-hide-matches-text": "Hide additional matches",
+      "search-more-match-text": "more match in this document",
+      "search-more-matches-text": "more matches in this document",
+      "search-clear-button-title": "Clear",
+      "search-detached-cancel-button-title": "Cancel",
+      "search-submit-button-title": "Submit"
+    }
+  }</script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="fullcontent">
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-sm navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <a class="navbar-brand" href="../../index.html">
+    <img src="../../house-solid.svg" alt="">
+  </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://google.com">ABOUT</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://facebook.com">POSTS</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://twitter.com">RESEARCH</a>
+  </li>  
+</ul>
+              <div class="quarto-toggle-container">
+                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+              </div>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full" data-sidebar-align="true">
+
+
+
+<div class="quarto-title-banner color-navbar page-columns page-full"><div class="quarto-title column-body"><h1 class="title display-7">Contrastable</h1><div class="quarto-description"><p>This post gives an overview of an R package I've written. The contrastable package provides a tidy approach to contrast coding for regression analyses.</p></div><div class="quarto-categories"><div class="quarto-category">R pkg</div></div></div></div><div class="quarto-title-meta"><div><div class="quarto-title-meta-heading">Author</div><div class="quarto-title-meta-contents"><div class="quarto-title-authors"><p>Thomas Sostarics</p></div></div></div><div><div class="quarto-title-meta-heading">Published</div><div class="quarto-title-meta-contents"><p class="date">July 12, 2022</p></div></div></div></header>
+<p>I’ve been working on a package called <code>contrastable</code> on and off for the past year or so. The package’s goal is to provide a tidy approach to setting factor contrasts for regression analysis. While this can be done with repeated <code>contrasts&lt;-</code> calls, this workflow is tedious when working with multiple factors and especially error-prone when manually specifying contrast matrices to use. In this latter case, the user would need to be careful to specify the correct fractions in the correct order with the correct signs, which can be a lot to keep track of. These issues quickly become apparent when the number of factor levels is greater than 2. In this post I will:</p>
+<ul>
+<li>Run through an example of a typical contrast coding workflow using <code>contrasts&lt;-</code>. I will give an example of an error that can arise due to a typo, and show how to diagnose what this error actually reflects by checking the hypothesis matrix.</li>
+<li>Show how the <code>contrastable</code> package can be used to sidestep mistakes caused by error-prone and tedious calls to <code>contrasts&lt;-</code>.</li>
+<li>Briefly link to other packages on contrasts and level comparisons.</li>
+</ul>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Where to find contrastable
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You can find the <code>contrastable</code> package on my Github at this repo: <a href="https://github.com/tsostarics/contrastable">tsostarics/contrastable</a> You an also install with:</p>
+<div class="cell">
+<div class="sourceCode" id="cb1"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">'tsostarics/contrastable'</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">'tsostarics/contrastable'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<section id="contrasts-overview" class="level2">
+<h2 class="anchored" data-anchor-id="contrasts-overview">Contrasts overview</h2>
+<p>Contrast coding refers to assigning numeric values to levels of a categorical variable for use in regression analyses. Depending on the numbers used, different comparisons can be made between the group means of a variable. These comparisons can correspond to particular null hypotheses that a researcher might have, and particular combinations of numbers can encode high-level questions like “Are there differences between levels when compared to a common reference level?” or “Does each level differ from the levels that came before it?” Critically, the contrasts used don’t impact the model fit but do impact the coefficient estimates that are used to make inferences about the data.</p>
+<p>In most cases in Linguistics, people tend to want pairwise comparisons while retaining main effects in their model; e.g., the main effect of speech rate on intelligibility when L1 vs L2 speakers are considered as a categorical fixed effect. Many people realize (or are starting to at least) that the default “0/1 contrasts” (aka treatment or dummy coding) will only give them the simple effect of intelligibility; that is, the effect of intelligibility for just the L1 group. To rectify this, researchers will opt for “the +.5/-.5 contrasts” to obtain main effects.</p>
+<div class="callout-warning callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Warning: Naming inconsistency
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The name for this contrast scheme is <em>not consistent</em>, especially in the 2-level case where the values are +.5/-.5. I’ve seen it called sum coding, simple coding, effects coding, scaled sum coding, helmert coding, difference coding, contrast coding, sum-to-zero coding, and +.5/-.5 coding. See <span class="citation" data-cites="brehm2022">Brehm and Alday (<a href="#ref-brehm2022" role="doc-biblioref">2022</a>)</span> for concerns about transparent descriptions of contrast coding schemes.</p>
+</div>
+</div>
+<p>While researchers may differ on what they call +.5/-.5, for 2 levels the result is nonetheless the same. But, a researcher using “helmert coding” and a researcher using “scaled sum coding” for a factor with 3 or more levels will be using very different contrast matrices, and thus address very different research questions about the data. Let’s use some functions from <code>contrastable</code> to look at how these contrast matrices differ.</p>
+<div class="cell">
+<div class="sourceCode" id="cb2"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(contrastable)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">2 levels</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">3 levels</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">5 levels</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labeledby="tabset-1-1-tab">
+<div class="cell">
+<div class="sourceCode" id="cb3"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">helmert_code</span>(<span class="dv">2</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-stdout">
+<pre><code>     [,1]
+[1,]  1/2
+[2,] -1/2</code></pre>
+</div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scaled_sum_code</span>(<span class="dv">2</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-stdout">
+<pre><code>  [,1]
+1  1/2
+2 -1/2</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labeledby="tabset-1-2-tab">
+<div class="cell">
+<div class="sourceCode" id="cb7"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">helmert_code</span>(<span class="dv">3</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-stdout">
+<pre><code>     [,1] [,2]
+[1,]  2/3    0
+[2,] -1/3  1/2
+[3,] -1/3 -1/2</code></pre>
+</div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scaled_sum_code</span>(<span class="dv">3</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-stdout">
+<pre><code>  [,1] [,2]
+1  2/3 -1/3
+2 -1/3  2/3
+3 -1/3 -1/3</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labeledby="tabset-1-3-tab">
+<div class="cell">
+<div class="sourceCode" id="cb11"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">helmert_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-stdout">
+<pre><code>     [,1] [,2] [,3] [,4]
+[1,]  4/5    0    0    0
+[2,] -1/5  3/4    0    0
+[3,] -1/5 -1/4  2/3    0
+[4,] -1/5 -1/4 -1/3  1/2
+[5,] -1/5 -1/4 -1/3 -1/2</code></pre>
+</div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scaled_sum_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-stdout">
+<pre><code>  [,1] [,2] [,3] [,4]
+1  4/5 -1/5 -1/5 -1/5
+2 -1/5  4/5 -1/5 -1/5
+3 -1/5 -1/5  4/5 -1/5
+4 -1/5 -1/5 -1/5  4/5
+5 -1/5 -1/5 -1/5 -1/5</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Note that I use the term <em>scaled sum coding</em> for the “pairwise comparisons with main effects” contrast scheme. I opt for this term for three reasons.</p>
+<ul>
+<li>First, I see sum coding used more frequently in statistics and econometrics to refer to +1/-1; this is also what <code>contr.sum</code> in R returns.</li>
+<li>Second, the salient part of going from sum coding to scaled sum coding, especially in the 2-level case, is that there’s some kind of division or scaling operation involved; I frequently see people use <code>contr.sum(2)/2</code>, although importantly <code>contr.sum(3)/3</code> does not yield the expected result.</li>
+<li>Third, “simple” coding is counterintuitive to me since we’re trying to <em>avoid</em> “simple effects;” “effects coding” and “contrast coding” are largely meaningless as all coding schemes will encode some kind of effect, and setting <em>any</em> contrast matrix is an instance of contrast coding.</li>
+</ul>
+<p>So, for the researcher trying to remember “I need to use <em>those</em> contrasts where they’re divided to get the main effects”, it (to me) seems easy to reach for a tool where <em>scaled</em> is in the name and is clearly distinguished from sum coding. <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+</section>
+<section id="typical-approach-to-contrast-coding" class="level2">
+<h2 class="anchored" data-anchor-id="typical-approach-to-contrast-coding">Typical approach to contrast coding</h2>
+<p>Typically when I see people in Linguistics set contrasts, they do something like the following, using the <code>palmerpenguins</code> dataset as an example.</p>
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(palmerpenguins)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>penguins_with_contrasts <span class="ot">&lt;-</span> penguins</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Default treatment/dummy coding for a 2 and 3 level factor</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(penguins_with_contrasts<span class="sc">$</span>sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>       male
+female    0
+male      1</code></pre>
+</div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(penguins_with_contrasts<span class="sc">$</span>species)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>          Chinstrap Gentoo
+Adelie            0      0
+Chinstrap         1      0
+Gentoo            0      1</code></pre>
+</div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Easy enough for 2 levels, -contr.sum(2)/2 is also used a lot</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(penguins_with_contrasts<span class="sc">$</span>sex) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">5</span>, .<span class="dv">5</span>) </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Not so fun for three levels!</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(penguins_with_contrasts<span class="sc">$</span>species) <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">2</span><span class="sc">/</span><span class="dv">3</span>, <span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                                                       <span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">2</span><span class="sc">/</span><span class="dv">3</span>),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                                                     <span class="at">nrow =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The chance of making a mistake increases when including more and more categorical variables. Catching these mistakes can be very difficult, in part because this workflow erases the labels in the regression output. This means you have to keep track of what <code>1</code> and <code>2</code> in the regression coefficients correspond to.</p>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note: Column/Comparison/Coefficient names
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>While the <code>dimnames</code> argument can be used to set the labels, anecdotally I rarely see people use this in their analyses when perusing code on the osf. <span class="citation" data-cites="winter2019">Winter (<a href="#ref-winter2019" role="doc-biblioref">2019, 127</a>)</span> notes that “Using the ‘1’ after the predictor name is a notational convention for representing the slopes of sum-coded predictors in R” but this is slightly incorrect; in the absence of <code>dimnames</code> being set, R will use the numeric indices of the contrast matrix’s columns (no matter what the scheme is).</p>
+</div>
+</div>
+<p>Below, the two sets of coefficients represent pairwise comparisons to the <code>Adelie</code> baseline, but the intercepts differ due to how the contrasts are set, with the first using treatment coding and the second using scaled sum coding. I’ll start with a case that only considers the categorical variable, but will include an additional continuous independent variable later on.</p>
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare the default treatment coding with the penguins dataset</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># with the contrasts we specified in penguins_with_contrasts</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(bill_length_mm <span class="sc">~</span> species, <span class="at">data =</span> penguins))    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>     (Intercept) speciesChinstrap    speciesGentoo 
+       38.791391        10.042433         8.713487 </code></pre>
+</div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(bill_length_mm <span class="sc">~</span> species, <span class="at">data =</span> penguins_with_contrasts)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>(Intercept)    species1    species2 
+  45.043364   10.042433    8.713487 </code></pre>
+</div>
+</div>
+<p>Had we made a mistake in the manually-set contrast matrix, we would reach an incorrect conclusion about the difference between groups.</p>
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># What if we accidentally typed 1/3 instead of 2/3?</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(penguins_with_contrasts<span class="sc">$</span>species) <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                                                       <span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">2</span><span class="sc">/</span><span class="dv">3</span>),</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                                                     <span class="at">nrow =</span> <span class="dv">3</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(bill_length_mm <span class="sc">~</span> species, <span class="at">data =</span> penguins_with_contrasts))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>(Intercept)    species1    species2 
+  46.717103   15.063649    8.713487 </code></pre>
+</div>
+</div>
+<p>Here we can see that the intercept and the value for <code>species1</code> has changed. To what though?? What does the new coefficient estimate represent?</p>
+<section id="diagnosing-our-mistake" class="level3">
+<h3 class="anchored" data-anchor-id="diagnosing-our-mistake">Diagnosing our mistake</h3>
+<p>To check what these numbers correspond to, we have to check the <em>hypothesis matrix</em> that corresponds to our <em>contrast matrix</em>. The process of obtaining the hypothesis matrix has been referred to as finding the generalized inverse of the contrast matrix <span class="citation" data-cites="schad2020">(see <a href="#ref-schad2020" role="doc-biblioref">Schad et al. 2020</a> for details)</span>.</p>
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>,         <span class="co"># Add a column of 1s for the intercept</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="sc">-</span><span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">2</span><span class="sc">/</span><span class="dv">3</span>),</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">nrow =</span> <span class="dv">3</span>,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, <span class="fu">c</span>(<span class="st">'Intercept'</span>, <span class="st">'species1'</span>, <span class="st">'species2'</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">t</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">solve</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  MASS<span class="sc">::</span><span class="fu">fractions</span>() <span class="co"># This function just shows numbers as fractions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>     Intercept species1 species2
+[1,]  1/6      -3/2       -1    
+[2,]  1/2       3/2        0    
+[3,]  1/3         0        1    </code></pre>
+</div>
+</div>
+<p>Here the intercept is represented by the weighted sum of each group mean, where the weights are shown in the intercept column. In most cases, the intercept should reflect the grand mean, or the mean of the group means, and so would usually have equal weights (i.e., <code>1/3</code> here) for the levels. In this case, we see the fractional weights are not the same. We can verify this by calculating the weighted mean ourselves:</p>
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>group_means <span class="ot">&lt;-</span> </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  penguins <span class="sc">|&gt;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(species) <span class="sc">|&gt;</span> </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarize</span>(<span class="at">mean_length =</span> <span class="fu">mean</span>(bill_length_mm, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  purrr<span class="sc">::</span><span class="fu">pluck</span>(<span class="st">'mean_length'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">names&lt;-</span><span class="st">`</span>(<span class="fu">c</span>(<span class="st">'Adelie'</span>, <span class="st">'Chinstrap'</span>, <span class="st">'Gentoo'</span>))</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>group_means</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>   Adelie Chinstrap    Gentoo 
+ 38.79139  48.83382  47.50488 </code></pre>
+</div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">weighted.mean</span>(group_means, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">6</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>[1] 46.7171</code></pre>
+</div>
+</div>
+<p>Similarly, the coefficient for <code>species1</code> shows the difference between the group means of levels 1 and 2 (i.e., mean of Chinstrap - mean of Adelie) but times a factor of <code>3/2</code>. Crucially, if our goal is to evaluate the difference between the means of these two levels, then our mistake in coding the hypothesis matrix will give us a larger estimate (~15 vs 10). Consider a similar setup where the larger estimate was 5 instead of 0; if we were relying on null hypothesis testing it’s possible we’d get a significant effect when really we shouldn’t have.</p>
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">3</span><span class="sc">/</span><span class="dv">2</span> <span class="sc">*</span> group_means[[<span class="st">'Chinstrap'</span>]]) <span class="sc">-</span> (<span class="dv">3</span><span class="sc">/</span><span class="dv">2</span> <span class="sc">*</span> group_means[[<span class="st">'Adelie'</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>[1] 15.06365</code></pre>
+</div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>group_means[[<span class="st">'Chinstrap'</span>]] <span class="sc">-</span> group_means[[<span class="st">'Adelie'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>[1] 10.04243</code></pre>
+</div>
+</div>
+<p>Point being: we made an honest mistake of typing <code>1/3</code> instead of <code>2/3</code> but this had ramifications for the coefficients in our model output that we use to make inferences. In practice, because we did the multiple <code>contrasts&lt;-</code> calls, we would likely assume that what we did was correct in the absence of any errors.</p>
+</section>
+</section>
+<section id="tidy-approach-to-contrasts" class="level2">
+<h2 class="anchored" data-anchor-id="tidy-approach-to-contrasts">Tidy approach to contrasts</h2>
+<p>Here I’ll show a different approach using the <code>contrastable</code> package. This package takes a tidy approach to take care of the overhead of labels and reference levels involved when using common contrast coding schemes. Specifically, this package provides a series of functions that use a special formula implementation that assigns specific meanings to each operator. The left hand side of the formula is the factor column whose contrasts you want to change. The right hand side consists of (at minimum) a function to generate contrast matrices such as <code>contr.treatment</code> or <code>treatment_code</code>. Additional operators provide extra optional functionality:</p>
+<ul>
+<li><code>+ x</code>: Set reference level to level <code>x</code></li>
+<li><code>* x</code>: Set intercept to be the mean of <code>x</code></li>
+<li><code>- 3:4</code>: For polynomial contrasts only, drop trends <code>3</code> and <code>4</code></li>
+<li><code>| c("A-B", "A-C")</code>: Set the comparison labels to <code>A-B</code> and <code>A-C</code> (must be the last operator if used)</li>
+</ul>
+<p>Recall that in many cases researchers want pairwise comparisons while retaining main effects, and so the choice of reference level for the comparisons is very important. By default, R uses the first level alphabetically as the reference level, but sometimes we want to change this manually ourselves. Here’s an example where we set the <code>sex</code> and <code>species</code> factors to the two contrast schemes we manually set before. The <code>set_contrasts</code> function will show a message if it detects additional factor variables in the dataframe that the user did not provide contrasts for.</p>
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># library(contrastable) was loaded earlier</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>penguins_df <span class="ot">&lt;-</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  penguins <span class="sc">|&gt;</span> </span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_contrasts</span>(sex <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="st">"male"</span>, <span class="co"># Set reference level with +</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                species <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="st">'Adelie'</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stderr">
+<pre><code>Expect contr.treatment or contr.poly for unset factors: island</code></pre>
+</div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(penguins_df<span class="sc">$</span>species) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>          Chinstrap Gentoo
+Adelie    -1/3      -1/3  
+Chinstrap  2/3      -1/3  
+Gentoo    -1/3       2/3  </code></pre>
+</div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(penguins_df<span class="sc">$</span>sex) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>       female
+female  1/2  
+male   -1/2  </code></pre>
+</div>
+</div>
+<p><code>penguins_df</code> now has its contrasts set, and we can run our model as usual. Note that we didn’t have to type out any matrices ourselves, but we got the correct contrasts that we needed.</p>
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(bill_length_mm <span class="sc">~</span> species <span class="sc">+</span> bill_depth_mm, <span class="at">data =</span> penguins_df))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>     (Intercept) speciesChinstrap    speciesGentoo    bill_depth_mm 
+       20.997115         9.938955        13.403279         1.394011 </code></pre>
+</div>
+</div>
+<p>If we wanted to change the labels to better reflect the comparisons being made, we could do that in the formula too with the <code>|</code> operator.</p>
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>penguins_df <span class="ot">&lt;-</span> </span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  penguins_df <span class="sc">|&gt;</span> </span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_contrasts</span>(species <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="st">'Adelie'</span> <span class="sc">|</span> </span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">c</span>(<span class="st">'Chinstrap-Ad'</span>, <span class="st">'Gentoo-Ad'</span>))</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(bill_length_mm <span class="sc">~</span> species, <span class="at">data =</span> penguins_df))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>        (Intercept) speciesChinstrap-Ad    speciesGentoo-Ad 
+          45.043364           10.042433            8.713487 </code></pre>
+</div>
+</div>
+<section id="additional-functions" class="level3">
+<h3 class="anchored" data-anchor-id="additional-functions">Additional functions</h3>
+<p>Typically when I use this package in my analyses the <code>set_contrasts</code> function is all I really need, but there are other functions that follow the same syntax that provide other information. To avoid retyping things, I’ll usually keep the contrasts in a list assigned to a separate variable and pass that to functions.</p>
+<p>The <code>glimpse_contrasts</code> function can show information about the factors in a dataset along with the contrast schemes that have been assigned to each factor.</p>
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>my_contrasts <span class="ot">&lt;-</span> </span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    sex <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="st">'female'</span>,</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    species <span class="sc">~</span> helmert_code</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse_contrasts</span>(penguins_df, my_contrasts) <span class="sc">|&gt;</span> gt<span class="sc">::</span><span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="tvjwomnfgu" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#tvjwomnfgu .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#tvjwomnfgu .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#tvjwomnfgu .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#tvjwomnfgu .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#tvjwomnfgu .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tvjwomnfgu .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#tvjwomnfgu .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#tvjwomnfgu .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#tvjwomnfgu .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#tvjwomnfgu .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#tvjwomnfgu .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#tvjwomnfgu .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#tvjwomnfgu .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#tvjwomnfgu .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#tvjwomnfgu .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#tvjwomnfgu .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#tvjwomnfgu .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tvjwomnfgu .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#tvjwomnfgu .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#tvjwomnfgu .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tvjwomnfgu .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#tvjwomnfgu .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#tvjwomnfgu .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tvjwomnfgu .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tvjwomnfgu .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#tvjwomnfgu .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#tvjwomnfgu .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tvjwomnfgu .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#tvjwomnfgu .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tvjwomnfgu .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#tvjwomnfgu .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tvjwomnfgu .gt_left {
+  text-align: left;
+}
+
+#tvjwomnfgu .gt_center {
+  text-align: center;
+}
+
+#tvjwomnfgu .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#tvjwomnfgu .gt_font_normal {
+  font-weight: normal;
+}
+
+#tvjwomnfgu .gt_font_bold {
+  font-weight: bold;
+}
+
+#tvjwomnfgu .gt_font_italic {
+  font-style: italic;
+}
+
+#tvjwomnfgu .gt_super {
+  font-size: 65%;
+}
+
+#tvjwomnfgu .gt_two_val_uncert {
+  display: inline-block;
+  line-height: 1em;
+  text-align: right;
+  font-size: 60%;
+  vertical-align: -0.25em;
+  margin-left: 0.1em;
+}
+
+#tvjwomnfgu .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#tvjwomnfgu .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#tvjwomnfgu .gt_slash_mark {
+  font-size: 0.7em;
+  line-height: 0.7em;
+  vertical-align: 0.15em;
+}
+
+#tvjwomnfgu .gt_fraction_numerator {
+  font-size: 0.6em;
+  line-height: 0.6em;
+  vertical-align: 0.45em;
+}
+
+#tvjwomnfgu .gt_fraction_denominator {
+  font-size: 0.6em;
+  line-height: 0.6em;
+  vertical-align: -0.05em;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">factor</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">n_levels</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">level_names</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">scheme</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">reference</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">intercept</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">orthogonal</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">centered</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">dropped_trends</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">explicitly_set</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">sex</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_center">female, male</td>
+<td class="gt_row gt_left">scaled_sum_code</td>
+<td class="gt_row gt_left">female</td>
+<td class="gt_row gt_left">grand mean</td>
+<td class="gt_row gt_center">NA</td>
+<td class="gt_row gt_center">TRUE</td>
+<td class="gt_row gt_left">NA</td>
+<td class="gt_row gt_center">TRUE</td></tr>
+    <tr><td class="gt_row gt_left">species</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_center">Adelie, Chinstrap, Gentoo</td>
+<td class="gt_row gt_left">helmert_code</td>
+<td class="gt_row gt_left">Gentoo</td>
+<td class="gt_row gt_left">grand mean</td>
+<td class="gt_row gt_center">TRUE</td>
+<td class="gt_row gt_center">TRUE</td>
+<td class="gt_row gt_left">NA</td>
+<td class="gt_row gt_center">TRUE</td></tr>
+    <tr><td class="gt_row gt_left">island</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_center">Biscoe, Dream, Torgersen</td>
+<td class="gt_row gt_left">contr.treatment</td>
+<td class="gt_row gt_left">Biscoe</td>
+<td class="gt_row gt_left">mean(Biscoe)</td>
+<td class="gt_row gt_center">FALSE</td>
+<td class="gt_row gt_center">FALSE</td>
+<td class="gt_row gt_left">NA</td>
+<td class="gt_row gt_center">FALSE</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+</div>
+</div>
+<p>The <code>enlist_contrasts</code> function does the same thing as <code>set_contrasts</code>, but returns a list of contrast matrices that can be used in the <code>contrasts</code> argument of some model-fitting functions.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> It also provides an easy way to show the contrast matrices in an appendix or supplementary material.</p>
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">enlist_contrasts</span>(penguins_df, my_contrasts) <span class="sc">|&gt;</span> purrr<span class="sc">::</span><span class="fu">map</span>(MASS<span class="sc">::</span>fractions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stderr">
+<pre><code>Expect contr.treatment or contr.poly for unset factors: island</code></pre>
+</div>
+<div class="cell-output-stdout">
+<pre><code>$sex
+       male
+female -1/2
+male    1/2
+
+$species
+          &gt;Adelie &gt;Chinstrap
+Adelie     2/3       0      
+Chinstrap -1/3     1/2      
+Gentoo    -1/3    -1/2      </code></pre>
+</div>
+</div>
+</section>
+<section id="available-contrast-schemes" class="level3">
+<h3 class="anchored" data-anchor-id="available-contrast-schemes">Available contrast schemes</h3>
+<p>Here are the different contrast functions this package currently provides.</p>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Treatment</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Sum</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">Scaled Sum</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false">Helmert</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false">Reverse Helmert</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-6" role="tab" aria-controls="tabset-2-6" aria-selected="false">Forward Difference</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-7" role="tab" aria-controls="tabset-2-7" aria-selected="false">Backward Difference</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-8-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-8" role="tab" aria-controls="tabset-2-8" aria-selected="false">Orthogonal Polynomials</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-9-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-9" role="tab" aria-controls="tabset-2-9" aria-selected="false">Raw Polynomials</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labeledby="tabset-2-1-tab">
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># = contr.treatment</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">treatment_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>  2 3 4 5
+1 0 0 0 0
+2 1 0 0 0
+3 0 1 0 0
+4 0 0 1 0
+5 0 0 0 1</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labeledby="tabset-2-2-tab">
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># = contr.sum</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>  [,1] [,2] [,3] [,4]
+1  1    0    0    0  
+2  0    1    0    0  
+3  0    0    1    0  
+4  0    0    0    1  
+5 -1   -1   -1   -1  </code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labeledby="tabset-2-3-tab">
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># = contr.sum</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">scaled_sum_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>  [,1] [,2] [,3] [,4]
+1  4/5 -1/5 -1/5 -1/5
+2 -1/5  4/5 -1/5 -1/5
+3 -1/5 -1/5  4/5 -1/5
+4 -1/5 -1/5 -1/5  4/5
+5 -1/5 -1/5 -1/5 -1/5</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labeledby="tabset-2-4-tab">
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># NOT = contr.helmert, which is unscaled</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">helmert_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>     [,1] [,2] [,3] [,4]
+[1,]  4/5    0    0    0
+[2,] -1/5  3/4    0    0
+[3,] -1/5 -1/4  2/3    0
+[4,] -1/5 -1/4 -1/3  1/2
+[5,] -1/5 -1/4 -1/3 -1/2</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labeledby="tabset-2-5-tab">
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reverse_helmert_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>     [,1] [,2] [,3] [,4]
+[1,] -1/2 -1/3 -1/4 -1/5
+[2,]  1/2 -1/3 -1/4 -1/5
+[3,]    0  2/3 -1/4 -1/5
+[4,]    0    0  3/4 -1/5
+[5,]    0    0    0  4/5</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-2-6" class="tab-pane" role="tabpanel" aria-labeledby="tabset-2-6-tab">
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">forward_difference_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>     [,1] [,2] [,3] [,4]
+[1,]  4/5  3/5  2/5  1/5
+[2,] -1/5  3/5  2/5  1/5
+[3,] -1/5 -2/5  2/5  1/5
+[4,] -1/5 -2/5 -3/5  1/5
+[5,] -1/5 -2/5 -3/5 -4/5</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-2-7" class="tab-pane" role="tabpanel" aria-labeledby="tabset-2-7-tab">
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">backward_difference_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>     [,1] [,2] [,3] [,4]
+[1,] -4/5 -3/5 -2/5 -1/5
+[2,]  1/5 -3/5 -2/5 -1/5
+[3,]  1/5  2/5 -2/5 -1/5
+[4,]  1/5  2/5  3/5 -1/5
+[5,]  1/5  2/5  3/5  4/5</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-2-8" class="tab-pane" role="tabpanel" aria-labeledby="tabset-2-8-tab">
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># = contr.poly, poly(1:n, degree = n-1, raw = FALSE)</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="fu">orth_polynomial_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>     .L                .Q                .C                ^4               
+[1,]          -265/419          929/1738  -2026009/6406803        4018/33617
+[2,]  -2026009/6406803         -809/3027           191/302    -246481/515552
+[3,]                 0       -6263/11717                 0         1042/1453
+[4,] 12484830/39480499         -809/3027          -265/419    -246481/515552
+[5,]           191/302          929/1738 10458821/33073696        4018/33617</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-2-9" class="tab-pane" role="tabpanel" aria-labeledby="tabset-2-9-tab">
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r cell-code code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># = poly(1:n, degree = n-1, raw = TRUE)</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="fu">raw_polynomial_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-stdout">
+<pre><code>     1   2   3   4  
+[1,]   1   1   1   1
+[2,]   2   4   8  16
+[3,]   3   9  27  81
+[4,]   4  16  64 256
+[5,]   5  25 125 625</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="other-packages-and-resources" class="level2">
+<h2 class="anchored" data-anchor-id="other-packages-and-resources">Other packages and resources</h2>
+<p>This package is not the first package made for contrast coding, though to my knowledge it is the first to take a “tidy” approach to it.</p>
+<p>The <code>hypr</code> package <span class="citation" data-cites="hypr">(<a href="#ref-hypr" role="doc-biblioref">Rabe et al. 2020</a>)</span> takes a different approach, where the focus is on considering the hypothesis matrix and declaring <em>specifically</em> which comparisons you want to make, then the package can provide a corresponding matrix. I like <code>hypr</code> a lot actually, but I find it a bit tedious when I know what the contrast matrix should look like but I have to type out the comparisons; still better than <code>matrix</code> calls though.</p>
+<p>The <code>emmeans</code> package <span class="citation" data-cites="emmeans">(<a href="#ref-emmeans" role="doc-biblioref">Lenth 2022</a>)</span> is extremely useful for making pairwise comparisons, but is capable of a lot more as well. You can see its vignette on contrasts <a href="https://cran.r-project.org/web/packages/emmeans/vignettes/comparisons.html">here</a>.</p>
+<p>The <code>multcomp</code> package <span class="citation" data-cites="multcomp">(<a href="#ref-multcomp" role="doc-biblioref">Hothorn, Bretz, and Westfall 2008</a>)</span> is useful for simultaneous inference, which seeks to extend workflows for multiple comparisons.</p>
+<p>I haven’t used the <code>contrasts</code> package <span class="citation" data-cites="contrasts">(<a href="#ref-contrasts" role="doc-biblioref">O’Callaghan 2021</a>)</span> very much, but judging from its vignette <a href="https://cran.r-project.org/web/packages/contrast/vignettes/contrast.html">here</a> it seems like it extends the <code>rms</code> package’s <code>contrast</code> function <span class="citation" data-cites="rms">(<a href="#ref-rms" role="doc-biblioref">Harrell Jr 2022</a>)</span>. It seems useful for calculating different comparisons after a model is run, but its usage isn’t very transparent to me on first glance.</p>
+<p>While not a package, <a href="https://stats.oarc.ucla.edu/r/library/r-library-contrast-coding-systems-for-categorical-variables/">this page from UCLA</a> pops up a lot when people discuss contrast coding. It’s very useful, and I used it as a starting point for implementing different contrast functions. However, I will note that I don’t follow its naming conventions.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-brehm2022" class="csl-entry" role="doc-biblioentry">
+Brehm, Laurel, and Phillip M. Alday. 2022. <span>“Contrast Coding Choices in a Decade of Mixed Models.”</span> <em>Journal of Memory and Language</em> 125: 104334. <a href="https://doi.org/10.1016/j.jml.2022.104334">https://doi.org/10.1016/j.jml.2022.104334</a>.
+</div>
+<div id="ref-rms" class="csl-entry" role="doc-biblioentry">
+Harrell Jr, Frank E. 2022. <em>Rms: Regression Modeling Strategies</em>. <a href="https://CRAN.R-project.org/package=rms">https://CRAN.R-project.org/package=rms</a>.
+</div>
+<div id="ref-multcomp" class="csl-entry" role="doc-biblioentry">
+Hothorn, Torsten, Frank Bretz, and Peter Westfall. 2008. <span>“Simultaneous Inference in General Parametric Models.”</span> <em>Biometrical Journal</em> 50 (3): 346–63. <a href="https://cran.r-project.org/package=multcomp">https://cran.r-project.org/package=multcomp</a>.
+</div>
+<div id="ref-emmeans" class="csl-entry" role="doc-biblioentry">
+Lenth, Russell V. 2022. <em>Emmeans: Estimated Marginal Means, Aka Least-Squares Means</em>. <a href="https://CRAN.R-project.org/package=emmeans">https://CRAN.R-project.org/package=emmeans</a>.
+</div>
+<div id="ref-contrasts" class="csl-entry" role="doc-biblioentry">
+O’Callaghan, Alan. 2021. <em>Contrast: A Collection of Contrast Methods</em>. <a href="https://CRAN.R-project.org/package=contrast">https://CRAN.R-project.org/package=contrast</a>.
+</div>
+<div id="ref-hypr" class="csl-entry" role="doc-biblioentry">
+Rabe, Maximilian M., Shravan Vasishth, Sven Hohenstein, Reinhold Kliegl, and Daniel J. Schad. 2020. <span>“Hypr: An r Package for Hypothesis-Driven Contrast Coding.”</span> <em>Journal of Open Source Software</em> 5 (48): 2134. <a href="https://doi.org/10.21105/joss.02134">https://doi.org/10.21105/joss.02134</a>.
+</div>
+<div id="ref-schad2020" class="csl-entry" role="doc-biblioentry">
+Schad, Daniel J., Shravan Vasishth, Sven Hohenstein, and Reinhold Kliegl. 2020. <span>“How to Capitalize on a Priori Contrasts in Linear (Mixed) Models: A Tutorial.”</span> <em>Journal of Memory and Language</em> 110: 104038. <a href="https://doi.org/10.1016/j.jml.2019.104038">https://doi.org/10.1016/j.jml.2019.104038</a>.
+</div>
+<div id="ref-winter2019" class="csl-entry" role="doc-biblioentry">
+Winter, Bodo. 2019. <em>Statistics for Linguists: An Introduction Using r</em>. Routledge.
+</div>
+</div></section><section class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1" role="doc-endnote"><p>If it were really up to me, I would call it “centered pairwise coding” since you get pairwise comparisons with the intercept centered on the grand mean, but it doesn’t quite roll off the tongue and it’s a bit wordy to type out.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>Not all modeling functions use the <code>contrasts</code> argument, <code>brms::brm</code> is one example. In these cases you <em>must</em> set the contrast matrix to the factor, hence <code>set_contrasts</code> is typically more useful for the actual modeling part while <code>enlist_contrasts</code> is useful for showing matrices.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+    } else {
+      disableStylesheet(alternateStylesheets);
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } 
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    setTimeout(function() {
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="tsostarics/blog" issue-term="title" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+      <div class="nav-footer-center">
+        <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/tsostarics/">
+      <i class="bi bi-github" role="img" aria-label="Github">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/t_sostarics">
+      <i class="bi bi-twitter" role="img" aria-label="Twitter">
+</i> 
+    </a>
+  </li>  
+</ul>
+      </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://google.com">Contact</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+</body></html>

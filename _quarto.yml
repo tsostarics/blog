@@ -2,20 +2,38 @@ project:
   type: website
 
 website:
-  title: "blog"
   navbar:
+    title: false
+    logo: "house-solid.svg"
+    collapse-below: sm
     right:
-      - about.qmd
-      - icon: github
-        href: https://github.com/
-      - icon: twitter
+      - text: ABOUT
+        href: https://google.com
+      - text: POSTS
+        href: https://facebook.com
+      - text: RESEARCH
         href: https://twitter.com
+  comments:
+    utterances:
+      repo: tsostarics/blog
+      theme: github-light
+      issue-term: title
+  page-footer:
+    center:
+      - icon: github
+        href: https://github.com/tsostarics/
+        aria-label: Github
+      - icon: twitter
+        href: https://twitter.com/t_sostarics
+        aria-label: Twitter
+    right:
+      - text: "Contact"
+        href: https://google.com
 format:
   html:
     theme:
       light: hex-light.scss
       dark: hex-dark.scss
     css: styles.css
-
 
 

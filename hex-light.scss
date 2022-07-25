@@ -1,12 +1,19 @@
 /*-- scss:defaults --*/
 $body-bg: #e7f3f6;
 $sidebarBgColorCustom: #b8d8e0;
-$body-color: #0a0c26;
+$body-color: #0a0c26; // Background color
+$navbar-bg: #b8d8e0; // Navbar color
+$navbar-fg: #1c385d; // Navbar text
+$code-block-bg: #ffffff !default; // Color for code blocks
+$code-block-border-left: #1c6278;
+$code-bg: #ffffff;
+$code-color: #96253d;
 $sidebarTextColorCustom: #0a0c26;
 $headlineColorCustom: #1c385d;
 $headingColorCustom: #1c385d;
 $bodyLinkColorCustom: #96253d;
 $navLinkColorCustom: #96253d;
+$navBgColor: #96253d;
 $sidebarLinkColorCustom: #1c6278;
 $footerTextColorCustom: #918f8d;
 $buttonTextColorCustom: #f12c58;
@@ -14,4 +21,40 @@ $buttonHoverTextColorCustom: #f8f7f8;
 $buttonBgColorCustom: #103742;
 $buttonHoverBgColorCustom: #96253d;
 $borderColorCustom: #b9d0d6;
+$highlight-style: github;
 /*-- scss:rules --*/
+// For the buttons and post headers
+h3, .quarto-category {
+  color: $navLinkColorCustom;
+}
+
+// For the button background
+div.quarto-post .listing-categories .listing-category{
+  color: lighten($navLinkColorCustom, 30%);
+  border-color: lighten($navLinkColorCustom, 20%);
+}
+
+.navbar .navbar-nav .nav-item::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    background-color: #96253d;
+    width: 0%;
+    content: "";
+    height: 1px;
+    transition: all 0.5s;
+  }
+
+.nav-footer a{
+  color: #96253d;
+}
+
+.nav-footer .active {
+  border-bottom: 1px solid #1c385d;
+}
+
+.nav-link:hover {
+  color: #1c385d;
+}

@@ -5,6 +5,9 @@ $navbar-fg: #e5fee0;
 $navbar-hover-color: #eccd37;
 $body-color: #f9faf5;
 $code-block-bg: lighten(#000, 20%) !default;
+$code-block-border-left: #a4c993;
+$code-bg: $code-block-bg;
+$code-color: #eccd37;
 $sidebarTextColorDark: #e5fee0;
 $headlineColorDark: #a4c993;
 $headingColorDark: #a4c993;
@@ -25,4 +28,37 @@ h3, .quarto-category {
 div.quarto-post .listing-categories .listing-category{
   color: lighten($navLinkColorDark, 30%);
   border-color: lighten($navLinkColorDark, 20%);
+}
+
+.navbar .navbar-nav .nav-item::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    background-color: #eccd37;
+    width: 0%;
+    content: "";
+    height: 1px;
+    transition: all 0.5s;
+  }
+
+.nav-footer a{
+  color: #eccd37;
+}
+
+.nav-footer a::after{
+  border-bottom: 1px solid #a4c993;
+}
+
+.nav-link{
+  color: #a4c993;
+}
+
+.nav-link:hover {
+  color: #a4c993;
+}
+
+a{
+ color: #eccd37;
 }
