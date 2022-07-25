@@ -157,8 +157,8 @@ but it doesn't quite roll off the tongue and it's a bit wordy to type out.
 ## Typical approach to contrast coding
 
 Typically when I see people in Linguistics set contrasts, they
-do something like the following, using the `palmerpenguins` dataset as an 
-example.
+do something like the following, using data from the `palmerpenguins` package
+[@palmerpenguins] as an example.
 
 ```{r}
 #| message: false

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.0.36">
+<meta name="generator" content="quarto-0.9.577">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -119,8 +119,8 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -243,7 +243,7 @@ Where to find contrastable
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>You can find the <code>contrastable</code> package on my Github at this repo: <a href="https://github.com/tsostarics/contrastable">tsostarics/contrastable</a> You an also install with:</p>
+<p>You can find the <code>contrastable</code> package on my Github at this repo: <a href="https://github.com/tsostarics/contrastable">tsostarics/contrastable</a> You can install it like so:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">'tsostarics/contrastable'</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">'tsostarics/contrastable'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -277,13 +277,13 @@ Warning: Naming inconsistency
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">helmert_code</span>(<span class="dv">2</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>     [,1]
 [1,]  1/2
 [2,] -1/2</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scaled_sum_code</span>(<span class="dv">2</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>  [,1]
 1  1/2
 2 -1/2</code></pre>
@@ -293,14 +293,14 @@ Warning: Naming inconsistency
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">helmert_code</span>(<span class="dv">3</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>     [,1] [,2]
 [1,]  2/3    0
 [2,] -1/3  1/2
 [3,] -1/3 -1/2</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scaled_sum_code</span>(<span class="dv">3</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>  [,1] [,2]
 1  2/3 -1/3
 2 -1/3  2/3
@@ -311,7 +311,7 @@ Warning: Naming inconsistency
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">helmert_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>     [,1] [,2] [,3] [,4]
 [1,]  4/5    0    0    0
 [2,] -1/5  3/4    0    0
@@ -320,7 +320,7 @@ Warning: Naming inconsistency
 [5,] -1/5 -1/4 -1/3 -1/2</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scaled_sum_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>  [,1] [,2] [,3] [,4]
 1  4/5 -1/5 -1/5 -1/5
 2 -1/5  4/5 -1/5 -1/5
@@ -342,7 +342,7 @@ Warning: Naming inconsistency
 </section>
 <section id="typical-approach-to-contrast-coding" class="level2">
 <h2 class="anchored" data-anchor-id="typical-approach-to-contrast-coding">Typical approach to contrast coding</h2>
-<p>Typically when I see people in Linguistics set contrasts, they do something like the following, using the <code>palmerpenguins</code> dataset as an example.</p>
+<p>Typically when I see people in Linguistics set contrasts, they do something like the following, using data from the <code>palmerpenguins</code> package <span class="citation" data-cites="palmerpenguins">(<a href="#ref-palmerpenguins" role="doc-biblioref">Horst, Hill, and Gorman 2020</a>)</span> as an example.</p>
 <div class="cell">
 <details open="">
 <summary>Code</summary>
@@ -353,7 +353,7 @@ Warning: Naming inconsistency
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Default treatment/dummy coding for a 2 and 3 level factor</span></span>
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(penguins_with_contrasts<span class="sc">$</span>sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>       male
 female    0
 male      1</code></pre>
@@ -362,7 +362,7 @@ male      1</code></pre>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(penguins_with_contrasts<span class="sc">$</span>species)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>          Chinstrap Gentoo
 Adelie            0      0
 Chinstrap         1      0
@@ -401,7 +401,7 @@ Note: Column/Comparison/Coefficient names
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># with the contrasts we specified in penguins_with_contrasts</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(bill_length_mm <span class="sc">~</span> species, <span class="at">data =</span> penguins))    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>     (Intercept) speciesChinstrap    speciesGentoo 
        38.791391        10.042433         8.713487 </code></pre>
 </div>
@@ -409,7 +409,7 @@ Note: Column/Comparison/Coefficient names
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(bill_length_mm <span class="sc">~</span> species, <span class="at">data =</span> penguins_with_contrasts)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>(Intercept)    species1    species2 
   45.043364   10.042433    8.713487 </code></pre>
 </div>
@@ -424,7 +424,7 @@ Note: Column/Comparison/Coefficient names
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                                                     <span class="at">nrow =</span> <span class="dv">3</span>)</span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(bill_length_mm <span class="sc">~</span> species, <span class="at">data =</span> penguins_with_contrasts))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>(Intercept)    species1    species2 
   46.717103   15.063649    8.713487 </code></pre>
 </div>
@@ -445,7 +445,7 @@ Note: Column/Comparison/Coefficient names
 <span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">solve</span>() <span class="sc">|&gt;</span> </span>
 <span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  MASS<span class="sc">::</span><span class="fu">fractions</span>() <span class="co"># This function just shows numbers as fractions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>     Intercept species1 species2
 [1,]  1/6      -3/2       -1    
 [2,]  1/2       3/2        0    
@@ -465,7 +465,7 @@ Note: Column/Comparison/Coefficient names
 <span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>group_means</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>   Adelie Chinstrap    Gentoo 
  38.79139  48.83382  47.50488 </code></pre>
 </div>
@@ -473,7 +473,7 @@ Note: Column/Comparison/Coefficient names
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">weighted.mean</span>(group_means, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">6</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>[1] 46.7171</code></pre>
 </div>
 </div>
@@ -483,14 +483,14 @@ Note: Column/Comparison/Coefficient names
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">3</span><span class="sc">/</span><span class="dv">2</span> <span class="sc">*</span> group_means[[<span class="st">'Chinstrap'</span>]]) <span class="sc">-</span> (<span class="dv">3</span><span class="sc">/</span><span class="dv">2</span> <span class="sc">*</span> group_means[[<span class="st">'Adelie'</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>[1] 15.06365</code></pre>
 </div>
 <details open="">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>group_means[[<span class="st">'Chinstrap'</span>]] <span class="sc">-</span> group_means[[<span class="st">'Adelie'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>[1] 10.04243</code></pre>
 </div>
 </div>
@@ -516,14 +516,14 @@ Note: Column/Comparison/Coefficient names
 <span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_contrasts</span>(sex <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="st">"male"</span>, <span class="co"># Set reference level with +</span></span>
 <span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                species <span class="sc">~</span> scaled_sum_code <span class="sc">+</span> <span class="st">'Adelie'</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stderr">
+<div class="cell-output cell-output-stderr">
 <pre><code>Expect contr.treatment or contr.poly for unset factors: island</code></pre>
 </div>
 <details open="">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(penguins_df<span class="sc">$</span>species) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>          Chinstrap Gentoo
 Adelie    -1/3      -1/3  
 Chinstrap  2/3      -1/3  
@@ -533,7 +533,7 @@ Gentoo    -1/3       2/3  </code></pre>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrasts</span>(penguins_df<span class="sc">$</span>sex) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>       female
 female  1/2  
 male   -1/2  </code></pre>
@@ -545,7 +545,7 @@ male   -1/2  </code></pre>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(bill_length_mm <span class="sc">~</span> species <span class="sc">+</span> bill_depth_mm, <span class="at">data =</span> penguins_df))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>     (Intercept) speciesChinstrap    speciesGentoo    bill_depth_mm 
        20.997115         9.938955        13.403279         1.394011 </code></pre>
 </div>
@@ -561,7 +561,7 @@ male   -1/2  </code></pre>
 <span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(<span class="fu">lm</span>(bill_length_mm <span class="sc">~</span> species, <span class="at">data =</span> penguins_df))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>        (Intercept) speciesChinstrap-Ad    speciesGentoo-Ad 
           45.043364           10.042433            8.713487 </code></pre>
 </div>
@@ -583,12 +583,12 @@ male   -1/2  </code></pre>
 </details>
 <div class="cell-output-display">
 
-<div id="tvjwomnfgu" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="lffkqwgevj" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#tvjwomnfgu .gt_table {
+#lffkqwgevj .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -613,7 +613,7 @@ male   -1/2  </code></pre>
   border-left-color: #D3D3D3;
 }
 
-#tvjwomnfgu .gt_heading {
+#lffkqwgevj .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -625,7 +625,7 @@ male   -1/2  </code></pre>
   border-right-color: #D3D3D3;
 }
 
-#tvjwomnfgu .gt_title {
+#lffkqwgevj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -637,7 +637,7 @@ male   -1/2  </code></pre>
   border-bottom-width: 0;
 }
 
-#tvjwomnfgu .gt_subtitle {
+#lffkqwgevj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -649,13 +649,13 @@ male   -1/2  </code></pre>
   border-top-width: 0;
 }
 
-#tvjwomnfgu .gt_bottom_border {
+#lffkqwgevj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#tvjwomnfgu .gt_col_headings {
+#lffkqwgevj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -670,7 +670,7 @@ male   -1/2  </code></pre>
   border-right-color: #D3D3D3;
 }
 
-#tvjwomnfgu .gt_col_heading {
+#lffkqwgevj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -690,7 +690,7 @@ male   -1/2  </code></pre>
   overflow-x: hidden;
 }
 
-#tvjwomnfgu .gt_column_spanner_outer {
+#lffkqwgevj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -702,15 +702,15 @@ male   -1/2  </code></pre>
   padding-right: 4px;
 }
 
-#tvjwomnfgu .gt_column_spanner_outer:first-child {
+#lffkqwgevj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#tvjwomnfgu .gt_column_spanner_outer:last-child {
+#lffkqwgevj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#tvjwomnfgu .gt_column_spanner {
+#lffkqwgevj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -722,7 +722,7 @@ male   -1/2  </code></pre>
   width: 100%;
 }
 
-#tvjwomnfgu .gt_group_heading {
+#lffkqwgevj .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -747,7 +747,7 @@ male   -1/2  </code></pre>
   vertical-align: middle;
 }
 
-#tvjwomnfgu .gt_empty_group_heading {
+#lffkqwgevj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -762,15 +762,15 @@ male   -1/2  </code></pre>
   vertical-align: middle;
 }
 
-#tvjwomnfgu .gt_from_md > :first-child {
+#lffkqwgevj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#tvjwomnfgu .gt_from_md > :last-child {
+#lffkqwgevj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#tvjwomnfgu .gt_row {
+#lffkqwgevj .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -789,7 +789,7 @@ male   -1/2  </code></pre>
   overflow-x: hidden;
 }
 
-#tvjwomnfgu .gt_stub {
+#lffkqwgevj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -802,7 +802,7 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-#tvjwomnfgu .gt_stub_row_group {
+#lffkqwgevj .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -816,11 +816,11 @@ male   -1/2  </code></pre>
   vertical-align: top;
 }
 
-#tvjwomnfgu .gt_row_group_first td {
+#lffkqwgevj .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#tvjwomnfgu .gt_summary_row {
+#lffkqwgevj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -830,16 +830,16 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-#tvjwomnfgu .gt_first_summary_row {
+#lffkqwgevj .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#tvjwomnfgu .gt_first_summary_row.thick {
+#lffkqwgevj .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#tvjwomnfgu .gt_last_summary_row {
+#lffkqwgevj .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -849,7 +849,7 @@ male   -1/2  </code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#tvjwomnfgu .gt_grand_summary_row {
+#lffkqwgevj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -859,7 +859,7 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-#tvjwomnfgu .gt_first_grand_summary_row {
+#lffkqwgevj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -869,11 +869,11 @@ male   -1/2  </code></pre>
   border-top-color: #D3D3D3;
 }
 
-#tvjwomnfgu .gt_striped {
+#lffkqwgevj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#tvjwomnfgu .gt_table_body {
+#lffkqwgevj .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -882,7 +882,7 @@ male   -1/2  </code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#tvjwomnfgu .gt_footnotes {
+#lffkqwgevj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -896,7 +896,7 @@ male   -1/2  </code></pre>
   border-right-color: #D3D3D3;
 }
 
-#tvjwomnfgu .gt_footnote {
+#lffkqwgevj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -905,7 +905,7 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-#tvjwomnfgu .gt_sourcenotes {
+#lffkqwgevj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -919,7 +919,7 @@ male   -1/2  </code></pre>
   border-right-color: #D3D3D3;
 }
 
-#tvjwomnfgu .gt_sourcenote {
+#lffkqwgevj .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -927,36 +927,36 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-#tvjwomnfgu .gt_left {
+#lffkqwgevj .gt_left {
   text-align: left;
 }
 
-#tvjwomnfgu .gt_center {
+#lffkqwgevj .gt_center {
   text-align: center;
 }
 
-#tvjwomnfgu .gt_right {
+#lffkqwgevj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#tvjwomnfgu .gt_font_normal {
+#lffkqwgevj .gt_font_normal {
   font-weight: normal;
 }
 
-#tvjwomnfgu .gt_font_bold {
+#lffkqwgevj .gt_font_bold {
   font-weight: bold;
 }
 
-#tvjwomnfgu .gt_font_italic {
+#lffkqwgevj .gt_font_italic {
   font-style: italic;
 }
 
-#tvjwomnfgu .gt_super {
+#lffkqwgevj .gt_super {
   font-size: 65%;
 }
 
-#tvjwomnfgu .gt_two_val_uncert {
+#lffkqwgevj .gt_two_val_uncert {
   display: inline-block;
   line-height: 1em;
   text-align: right;
@@ -965,31 +965,31 @@ male   -1/2  </code></pre>
   margin-left: 0.1em;
 }
 
-#tvjwomnfgu .gt_footnote_marks {
+#lffkqwgevj .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#tvjwomnfgu .gt_asterisk {
+#lffkqwgevj .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#tvjwomnfgu .gt_slash_mark {
+#lffkqwgevj .gt_slash_mark {
   font-size: 0.7em;
   line-height: 0.7em;
   vertical-align: 0.15em;
 }
 
-#tvjwomnfgu .gt_fraction_numerator {
+#lffkqwgevj .gt_fraction_numerator {
   font-size: 0.6em;
   line-height: 0.6em;
   vertical-align: 0.45em;
 }
 
-#tvjwomnfgu .gt_fraction_denominator {
+#lffkqwgevj .gt_fraction_denominator {
   font-size: 0.6em;
   line-height: 0.6em;
   vertical-align: -0.05em;
@@ -1055,10 +1055,10 @@ male   -1/2  </code></pre>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">enlist_contrasts</span>(penguins_df, my_contrasts) <span class="sc">|&gt;</span> purrr<span class="sc">::</span><span class="fu">map</span>(MASS<span class="sc">::</span>fractions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stderr">
+<div class="cell-output cell-output-stderr">
 <pre><code>Expect contr.treatment or contr.poly for unset factors: island</code></pre>
 </div>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>$sex
        male
 female -1/2
@@ -1085,7 +1085,7 @@ Gentoo    -1/3    -1/2      </code></pre>
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># = contr.treatment</span></span>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">treatment_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>  2 3 4 5
 1 0 0 0 0
 2 1 0 0 0
@@ -1102,7 +1102,7 @@ Gentoo    -1/3    -1/2      </code></pre>
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># = contr.sum</span></span>
 <span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>  [,1] [,2] [,3] [,4]
 1  1    0    0    0  
 2  0    1    0    0  
@@ -1119,7 +1119,7 @@ Gentoo    -1/3    -1/2      </code></pre>
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># = contr.sum</span></span>
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">scaled_sum_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>  [,1] [,2] [,3] [,4]
 1  4/5 -1/5 -1/5 -1/5
 2 -1/5  4/5 -1/5 -1/5
@@ -1136,7 +1136,7 @@ Gentoo    -1/3    -1/2      </code></pre>
 <div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># NOT = contr.helmert, which is unscaled</span></span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">helmert_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>     [,1] [,2] [,3] [,4]
 [1,]  4/5    0    0    0
 [2,] -1/5  3/4    0    0
@@ -1152,7 +1152,7 @@ Gentoo    -1/3    -1/2      </code></pre>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reverse_helmert_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>     [,1] [,2] [,3] [,4]
 [1,] -1/2 -1/3 -1/4 -1/5
 [2,]  1/2 -1/3 -1/4 -1/5
@@ -1168,7 +1168,7 @@ Gentoo    -1/3    -1/2      </code></pre>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">forward_difference_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>     [,1] [,2] [,3] [,4]
 [1,]  4/5  3/5  2/5  1/5
 [2,] -1/5  3/5  2/5  1/5
@@ -1184,7 +1184,7 @@ Gentoo    -1/3    -1/2      </code></pre>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">backward_difference_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>     [,1] [,2] [,3] [,4]
 [1,] -4/5 -3/5 -2/5 -1/5
 [2,]  1/5 -3/5 -2/5 -1/5
@@ -1201,7 +1201,7 @@ Gentoo    -1/3    -1/2      </code></pre>
 <div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># = contr.poly, poly(1:n, degree = n-1, raw = FALSE)</span></span>
 <span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="fu">orth_polynomial_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>     .L                .Q                .C                ^4               
 [1,]          -265/419          929/1738  -2026009/6406803        4018/33617
 [2,]  -2026009/6406803         -809/3027           191/302    -246481/515552
@@ -1218,7 +1218,7 @@ Gentoo    -1/3    -1/2      </code></pre>
 <div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># = poly(1:n, degree = n-1, raw = TRUE)</span></span>
 <span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="fu">raw_polynomial_code</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> MASS<span class="sc">::</span><span class="fu">fractions</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-stdout">
+<div class="cell-output cell-output-stdout">
 <pre><code>     1   2   3   4  
 [1,]   1   1   1   1
 [2,]   2   4   8  16
@@ -1253,6 +1253,9 @@ Brehm, Laurel, and Phillip M. Alday. 2022. <span>“Contrast Coding Choices in a
 <div id="ref-rms" class="csl-entry" role="doc-biblioentry">
 Harrell Jr, Frank E. 2022. <em>Rms: Regression Modeling Strategies</em>. <a href="https://CRAN.R-project.org/package=rms">https://CRAN.R-project.org/package=rms</a>.
 </div>
+<div id="ref-palmerpenguins" class="csl-entry" role="doc-biblioentry">
+Horst, Allison Marie, Alison Presmanes Hill, and Kristen B Gorman. 2020. <em>Palmerpenguins: Palmer Archipelago (Antarctica) Penguin Data</em>. <a href="https://allisonhorst.github.io/palmerpenguins/">https://allisonhorst.github.io/palmerpenguins/</a>.
+</div>
 <div id="ref-multcomp" class="csl-entry" role="doc-biblioentry">
 Hothorn, Torsten, Frank Bretz, and Peter Westfall. 2008. <span>“Simultaneous Inference in General Parametric Models.”</span> <em>Biometrical Journal</em> 50 (3): 346–63. <a href="https://cran.r-project.org/package=multcomp">https://cran.r-project.org/package=multcomp</a>.
 </div>
@@ -1280,24 +1283,6 @@ Winter, Bodo. 2019. <em>Statistics for Linguists: An Introduction Using r</em>. 
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
-    }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
   const disableStylesheet = (stylesheets) => {
     for (let i=0; i < stylesheets.length; i++) {
       const stylesheet = stylesheets[i];
@@ -1327,14 +1312,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     manageTransitions('#quarto-margin-sidebar .nav-link', false);
     if (alternate) {
       enableStylesheet(alternateStylesheets);
-      for (const sheetNode of alternateStylesheets) {
-        if (sheetNode.id === "quarto-bootstrap") {
-          toggleBodyColorMode(sheetNode);
-        }
-      }
     } else {
       disableStylesheet(alternateStylesheets);
-      toggleBodyColorPrimary();
     }
     manageTransitions('#quarto-margin-sidebar .nav-link', true);
     // Switch the toggles
