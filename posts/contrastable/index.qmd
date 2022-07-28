@@ -69,13 +69,19 @@ In most cases in Linguistics, people tend to want pairwise comparisons while
 retaining main effects in their model; e.g., the main effect of speech rate
 on intelligibility when L1 vs L2 speakers are considered as a categorical fixed
 effect.
-Many people realize (or are starting to at least) that the default
+Many people realize (or are starting to at least) that the default[^defaults]
 "0/1 contrasts" (aka treatment or dummy coding) will only give them the simple
 effect of intelligibility; that is, the effect of intelligibility for just the
 L1 group.
 To rectify this, researchers will opt for "the +.5/-.5 contrasts" to obtain
 main effects.
 
+[^defaults]: You can view your default contrasts using `options('contrasts')`,
+where the unordered default is typically `contr.treatment` and the ordered 
+default is typically `contr.poly`. I do not recommend changing these defaults
+because even though you may save some time for yourself, if you forget to
+explicitly mention that you changed the defaults then your analyses won't be
+reproducible by the vast majority of others who have not changed the deafults.
 
 :::{.callout-warning}
 ## Warning: Naming inconsistency

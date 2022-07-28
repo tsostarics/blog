@@ -253,7 +253,7 @@ Where to find contrastable
 <section id="contrasts-overview" class="level2">
 <h2 class="anchored" data-anchor-id="contrasts-overview">Contrasts overview</h2>
 <p>Contrast coding refers to assigning numeric values to levels of a categorical variable for use in regression analyses. Depending on the numbers used, different comparisons can be made between the group means of a variable. These comparisons can correspond to particular null hypotheses that a researcher might have, and particular combinations of numbers can encode high-level questions like “Are there differences between levels when compared to a common reference level?” or “Does each level differ from the levels that came before it?” Critically, the contrasts used don’t impact the model fit but do impact the coefficient estimates that are used to make inferences about the data.</p>
-<p>In most cases in Linguistics, people tend to want pairwise comparisons while retaining main effects in their model; e.g., the main effect of speech rate on intelligibility when L1 vs L2 speakers are considered as a categorical fixed effect. Many people realize (or are starting to at least) that the default “0/1 contrasts” (aka treatment or dummy coding) will only give them the simple effect of intelligibility; that is, the effect of intelligibility for just the L1 group. To rectify this, researchers will opt for “the +.5/-.5 contrasts” to obtain main effects.</p>
+<p>In most cases in Linguistics, people tend to want pairwise comparisons while retaining main effects in their model; e.g., the main effect of speech rate on intelligibility when L1 vs L2 speakers are considered as a categorical fixed effect. Many people realize (or are starting to at least) that the default<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> “0/1 contrasts” (aka treatment or dummy coding) will only give them the simple effect of intelligibility; that is, the effect of intelligibility for just the L1 group. To rectify this, researchers will opt for “the +.5/-.5 contrasts” to obtain main effects.</p>
 <div class="callout-warning callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -338,7 +338,7 @@ Warning: Naming inconsistency
 <li>Second, the salient part of going from sum coding to scaled sum coding, especially in the 2-level case, is that there’s some kind of division or scaling operation involved; I frequently see people use <code>contr.sum(2)/2</code>, although importantly <code>contr.sum(3)/3</code> does not yield the expected result.</li>
 <li>Third, “simple” coding is counterintuitive to me since we’re trying to <em>avoid</em> “simple effects;” “effects coding” and “contrast coding” are largely meaningless as all coding schemes will encode some kind of effect, and setting <em>any</em> contrast matrix is an instance of contrast coding.</li>
 </ul>
-<p>So, for the researcher trying to remember “I need to use <em>those</em> contrasts where they’re divided to get the main effects”, it (to me) seems easy to reach for a tool where <em>scaled</em> is in the name and is clearly distinguished from sum coding. <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>So, for the researcher trying to remember “I need to use <em>those</em> contrasts where they’re divided to get the main effects”, it (to me) seems easy to reach for a tool where <em>scaled</em> is in the name and is clearly distinguished from sum coding. <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 </section>
 <section id="typical-approach-to-contrast-coding" class="level2">
 <h2 class="anchored" data-anchor-id="typical-approach-to-contrast-coding">Typical approach to contrast coding</h2>
@@ -611,12 +611,12 @@ male   -1/2  </code></pre>
 </details>
 <div class="cell-output-display">
 
-<div id="kfrbbueghy" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="hvoueuaabw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#kfrbbueghy .gt_table {
+#hvoueuaabw .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -641,7 +641,7 @@ male   -1/2  </code></pre>
   border-left-color: #D3D3D3;
 }
 
-#kfrbbueghy .gt_heading {
+#hvoueuaabw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -653,7 +653,7 @@ male   -1/2  </code></pre>
   border-right-color: #D3D3D3;
 }
 
-#kfrbbueghy .gt_title {
+#hvoueuaabw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -665,7 +665,7 @@ male   -1/2  </code></pre>
   border-bottom-width: 0;
 }
 
-#kfrbbueghy .gt_subtitle {
+#hvoueuaabw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -677,13 +677,13 @@ male   -1/2  </code></pre>
   border-top-width: 0;
 }
 
-#kfrbbueghy .gt_bottom_border {
+#hvoueuaabw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#kfrbbueghy .gt_col_headings {
+#hvoueuaabw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -698,7 +698,7 @@ male   -1/2  </code></pre>
   border-right-color: #D3D3D3;
 }
 
-#kfrbbueghy .gt_col_heading {
+#hvoueuaabw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -718,7 +718,7 @@ male   -1/2  </code></pre>
   overflow-x: hidden;
 }
 
-#kfrbbueghy .gt_column_spanner_outer {
+#hvoueuaabw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -730,15 +730,15 @@ male   -1/2  </code></pre>
   padding-right: 4px;
 }
 
-#kfrbbueghy .gt_column_spanner_outer:first-child {
+#hvoueuaabw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#kfrbbueghy .gt_column_spanner_outer:last-child {
+#hvoueuaabw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#kfrbbueghy .gt_column_spanner {
+#hvoueuaabw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -750,7 +750,7 @@ male   -1/2  </code></pre>
   width: 100%;
 }
 
-#kfrbbueghy .gt_group_heading {
+#hvoueuaabw .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -775,7 +775,7 @@ male   -1/2  </code></pre>
   vertical-align: middle;
 }
 
-#kfrbbueghy .gt_empty_group_heading {
+#hvoueuaabw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -790,15 +790,15 @@ male   -1/2  </code></pre>
   vertical-align: middle;
 }
 
-#kfrbbueghy .gt_from_md > :first-child {
+#hvoueuaabw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#kfrbbueghy .gt_from_md > :last-child {
+#hvoueuaabw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#kfrbbueghy .gt_row {
+#hvoueuaabw .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -817,7 +817,7 @@ male   -1/2  </code></pre>
   overflow-x: hidden;
 }
 
-#kfrbbueghy .gt_stub {
+#hvoueuaabw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -830,7 +830,7 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-#kfrbbueghy .gt_stub_row_group {
+#hvoueuaabw .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -844,11 +844,11 @@ male   -1/2  </code></pre>
   vertical-align: top;
 }
 
-#kfrbbueghy .gt_row_group_first td {
+#hvoueuaabw .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#kfrbbueghy .gt_summary_row {
+#hvoueuaabw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -858,16 +858,16 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-#kfrbbueghy .gt_first_summary_row {
+#hvoueuaabw .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#kfrbbueghy .gt_first_summary_row.thick {
+#hvoueuaabw .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#kfrbbueghy .gt_last_summary_row {
+#hvoueuaabw .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -877,7 +877,7 @@ male   -1/2  </code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#kfrbbueghy .gt_grand_summary_row {
+#hvoueuaabw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -887,7 +887,7 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-#kfrbbueghy .gt_first_grand_summary_row {
+#hvoueuaabw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -897,11 +897,11 @@ male   -1/2  </code></pre>
   border-top-color: #D3D3D3;
 }
 
-#kfrbbueghy .gt_striped {
+#hvoueuaabw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#kfrbbueghy .gt_table_body {
+#hvoueuaabw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -910,7 +910,7 @@ male   -1/2  </code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#kfrbbueghy .gt_footnotes {
+#hvoueuaabw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -924,7 +924,7 @@ male   -1/2  </code></pre>
   border-right-color: #D3D3D3;
 }
 
-#kfrbbueghy .gt_footnote {
+#hvoueuaabw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -933,7 +933,7 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-#kfrbbueghy .gt_sourcenotes {
+#hvoueuaabw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -947,7 +947,7 @@ male   -1/2  </code></pre>
   border-right-color: #D3D3D3;
 }
 
-#kfrbbueghy .gt_sourcenote {
+#hvoueuaabw .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -955,36 +955,36 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-#kfrbbueghy .gt_left {
+#hvoueuaabw .gt_left {
   text-align: left;
 }
 
-#kfrbbueghy .gt_center {
+#hvoueuaabw .gt_center {
   text-align: center;
 }
 
-#kfrbbueghy .gt_right {
+#hvoueuaabw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#kfrbbueghy .gt_font_normal {
+#hvoueuaabw .gt_font_normal {
   font-weight: normal;
 }
 
-#kfrbbueghy .gt_font_bold {
+#hvoueuaabw .gt_font_bold {
   font-weight: bold;
 }
 
-#kfrbbueghy .gt_font_italic {
+#hvoueuaabw .gt_font_italic {
   font-style: italic;
 }
 
-#kfrbbueghy .gt_super {
+#hvoueuaabw .gt_super {
   font-size: 65%;
 }
 
-#kfrbbueghy .gt_two_val_uncert {
+#hvoueuaabw .gt_two_val_uncert {
   display: inline-block;
   line-height: 1em;
   text-align: right;
@@ -993,31 +993,31 @@ male   -1/2  </code></pre>
   margin-left: 0.1em;
 }
 
-#kfrbbueghy .gt_footnote_marks {
+#hvoueuaabw .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-#kfrbbueghy .gt_asterisk {
+#hvoueuaabw .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#kfrbbueghy .gt_slash_mark {
+#hvoueuaabw .gt_slash_mark {
   font-size: 0.7em;
   line-height: 0.7em;
   vertical-align: 0.15em;
 }
 
-#kfrbbueghy .gt_fraction_numerator {
+#hvoueuaabw .gt_fraction_numerator {
   font-size: 0.6em;
   line-height: 0.6em;
   vertical-align: 0.45em;
 }
 
-#kfrbbueghy .gt_fraction_denominator {
+#hvoueuaabw .gt_fraction_denominator {
   font-size: 0.6em;
   line-height: 0.6em;
   vertical-align: -0.05em;
@@ -1077,7 +1077,7 @@ male   -1/2  </code></pre>
 </div>
 </div>
 </div>
-<p>The <code>enlist_contrasts</code> function does the same thing as <code>set_contrasts</code>, but returns a list of contrast matrices that can be used in the <code>contrasts</code> argument of some model-fitting functions.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> It also provides an easy way to show the contrast matrices in an appendix or supplementary material.</p>
+<p>The <code>enlist_contrasts</code> function does the same thing as <code>set_contrasts</code>, but returns a list of contrast matrices that can be used in the <code>contrasts</code> argument of some model-fitting functions.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> It also provides an easy way to show the contrast matrices in an appendix or supplementary material.</p>
 <div class="cell">
 <details open="">
 <summary>Code</summary>
@@ -1302,8 +1302,9 @@ Winter, Bodo. 2019. <em>Statistics for Linguists: An Introduction Using r</em>. 
 </div></section><section class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1" role="doc-endnote"><p>If it were really up to me, I would call it “centered pairwise coding” since you get pairwise comparisons with the intercept centered on the grand mean, but it doesn’t quite roll off the tongue and it’s a bit wordy to type out.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p>Not all modeling functions use the <code>contrasts</code> argument, <code>brms::brm</code> is one example. In these cases you <em>must</em> set the contrast matrix to the factor, hence <code>set_contrasts</code> is typically more useful for the actual modeling part while <code>enlist_contrasts</code> is useful for showing matrices.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1" role="doc-endnote"><p>You can view your default contrasts using <code>options('contrasts')</code>, where the unordered default is typically <code>contr.treatment</code> and the ordered default is typically <code>contr.poly</code>. I do not recommend changing these defaults because even though you may save some time for yourself, if you forget to explicitly mention that you changed the defaults then your analyses won’t be reproducible by the vast majority of others who have not changed the deafults.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>If it were really up to me, I would call it “centered pairwise coding” since you get pairwise comparisons with the intercept centered on the grand mean, but it doesn’t quite roll off the tongue and it’s a bit wordy to type out.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p>Not all modeling functions use the <code>contrasts</code> argument, <code>brms::brm</code> is one example. In these cases you <em>must</em> set the contrast matrix to the factor, hence <code>set_contrasts</code> is typically more useful for the actual modeling part while <code>enlist_contrasts</code> is useful for showing matrices.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
