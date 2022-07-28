@@ -134,13 +134,13 @@ Note that I use the term *scaled sum coding* for the "pairwise comparisons with
 main effects" contrast scheme.
 I opt for this term for three reasons.
 
- - First, I see sum coding used more frequently in statistics and econometrics to refer
+- First, I see sum coding used more frequently in statistics and econometrics to refer
 to +1/-1; this is also what `contr.sum` in R returns.
- - Second, the salient part of going from sum coding to scaled sum coding, especially
+- Second, the salient part of going from sum coding to scaled sum coding, especially
 in the 2-level case, is that there's some kind of division or scaling operation
 involved; I frequently see people use `contr.sum(2)/2`, although importantly
 `contr.sum(3)/3` does not yield the expected result.
- - Third, "simple" coding is counterintuitive to me since we're trying to *avoid* 
+- Third, "simple" coding is counterintuitive to me since we're trying to *avoid* 
 "simple effects;" "effects coding" and "contrast coding" are largely meaningless
 as all coding schemes will encode some kind of effect, and setting *any*
 contrast matrix is an instance of contrast coding.
@@ -157,8 +157,8 @@ but it doesn't quite roll off the tongue and it's a bit wordy to type out.
 ## Typical approach to contrast coding
 
 Typically when I see people in Linguistics set contrasts, they
-do something like the following, using data from the `palmerpenguins` package
-[@palmerpenguins] as an example.
+do something like the following, using the `palmerpenguins` dataset as an 
+example.
 
 ```{r}
 #| message: false
@@ -210,8 +210,14 @@ but will include an additional continuous independent variable later on.
 ```{r}
 # Compare the default treatment coding with the penguins dataset
 # with the contrasts we specified in penguins_with_contrasts
-coef(lm(bill_length_mm ~ species, data = penguins))    
-coef(lm(bill_length_mm ~ species, data = penguins_with_contrasts)) 
+treatment_coefs <- coef(lm(bill_length_mm ~ species,
+                           data = penguins))    
+scaledsum_coefs <- coef(lm(bill_length_mm ~ species, 
+                           data = penguins_with_contrasts)) 
+
+# I'm using list() to print and caption results side by side, purely aesthetic
+list("(Default) Treatment Coding" = treatment_coefs,
+     "(Manual) Scaled Sum Coding" = scaledsum_coefs)
 ```
 
 Had we made a mistake in the manually-set contrast matrix, we would reach
@@ -222,7 +228,11 @@ an incorrect conclusion about the difference between groups.
 contrasts(penguins_with_contrasts$species) <- matrix(c(-1/3, 1/3, -1/3,
                                                        -1/3, -1/3, 2/3),
                                                      nrow = 3)
-coef(lm(bill_length_mm ~ species, data = penguins_with_contrasts))
+mistake_coefs <- coef(lm(bill_length_mm ~ species, 
+                         data = penguins_with_contrasts))
+
+list("(Current) Mistaken Scaled Sum Coding:" = mistake_coefs,
+     "(Previous) Correct Scaled Sum Coding:" = scaledsum_coefs)
 ```
 
 Here we can see that the intercept and the value for `species1` has changed.
@@ -266,7 +276,8 @@ group_means <-
 
 group_means
 
-weighted.mean(group_means, c(1/6, 1/2, 1/3))
+list("Grand Mean" = mean(group_means),
+     "Weighted mean" = weighted.mean(group_means, c(1/6, 1/2, 1/3)))
 ```
 
 
@@ -281,8 +292,12 @@ we were relying on null hypothesis testing it's possible we'd get a significant
 effect when really we shouldn't have.
 
 ```{r}
-(3/2 * group_means[['Chinstrap']]) - (3/2 * group_means[['Adelie']])
-group_means[['Chinstrap']] - group_means[['Adelie']]
+list("Mistaken Scaled Sum Coding" = mistake_coefs,
+     "Correct Scaled Sum Coding" = scaledsum_coefs,
+     "Computed Chinstrap-Adelie Difference with 3/2 scaling" = 
+       (3/2 * group_means[['Chinstrap']]) - (3/2 * group_means[['Adelie']]),
+     "Actual Chinstrap-Adelie Difference" = 
+       group_means[['Chinstrap']] - group_means[['Adelie']])
 ```
 
 Point being: we made an honest mistake of typing `1/3` instead of `2/3` but
@@ -431,7 +446,7 @@ helmert_code(5) |> MASS::fractions()
 ```{r}
 reverse_helmert_code(5) |> MASS::fractions()
 ```
- 
+
 
 ### Forward Difference
 
