@@ -211,7 +211,7 @@ Here's a pretty basic wrapper that encapsulates all of the previous steps into
 one function and operates over all the files in given directories containing
 TextGrids and PitchTiers.
 
-::: {.callout-caution}
+::: {.callout-tip}
 If I were to do this for a larger set of files, I would probably split this up
 into two parts where I first load all the files *then* join them together.
 The reason being that if there's an issue with joining the files in the below
@@ -314,7 +314,7 @@ but will not allow for more pulses than what exists in the interval already.
 Additionally, that function extracts pulses based on modular arithmetic rather
 than linear interpolation, so any discontinuities are ignored in the result.
 
-::: {.callout-caution}
+::: {.callout-tip}
 At the time of this writing, a warning will be thrown since `reframe` was added 
 to dplyr to take over a deprecated functionality from `summarize`.
 I will fix this in the package at a later data after `dplyr` 1.1 is released. 
