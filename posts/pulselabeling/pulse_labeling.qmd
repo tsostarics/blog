@@ -5,6 +5,7 @@ date: '2023-01-25'
 editor: source
 description: "This post discusses using non-equi joins to label pitch pulses by an interval on a TextGrid."
 # bibliography: mybib.bib
+toc: true
 categories: ['R','Praat']
 code-tools: false
 code-fold: 'show'
