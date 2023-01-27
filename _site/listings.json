@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/pulselabeling/pulse_labeling.html",
       "/posts/contrastable/index.html"
     ]
   }

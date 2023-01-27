@@ -1,0 +1,400 @@
+---
+title: "Pulse Labeling"
+author: "Thomas Sostarics"
+date: '2023-01-25'
+editor: source
+description: "This post discusses using non-equi joins to label pitch pulses by an interval on a TextGrid."
+# bibliography: mybib.bib
+categories: ['R','Praat']
+code-tools: false
+code-fold: 'show'
+execute:
+  message: false
+  echo: true
+  warning: false
+---
+
+A colleague of mine recently asked for help with a bit of a tricky problem.
+Pitch contours, when extracted from an acoustic signal, come in the form of a
+time series of discretized *pulses*: a (time, frequency) point.
+However, these contours occur over varying parts of the spoken sentence.
+In other words, the rises and falls in pitch occur over different words, syllables,
+and phones-- all of which have varying durations.
+If we take a pitch contour over a single word from the productions of many
+speakers, then time normalize them, we don't have access to the relative durations
+and landmarks of the syllables that make up the token.
+For instance, if two speakers rise from 110Hz to 220Hz over one syllable,
+this rise will be much steeper if the first syllable is 30% of the time normalized
+duration compared to if the first syllable is 60% of the time normalized duration.
+The problem then becomes two related problems: 
+
+1. How can we know which syllable a pulse appears in? (ie how to label the pulse with the syllable number)
+2. How can we assess a pulse's timestamp relative to the timestamp of the syllable
+boundaries it occurs with? (eg how far into the syllable does the pulse occur)
+
+As it happens, this problem becomes fairly straightforward when using [non-equi joins](https://www.w3resource.com/sql/joins/perform-a-non-equi-join.php).
+These are joins (left, right, etc.) that match not merely on equivalence matching,
+but when more complex logical operations need to be used.
+In our case, we want to merge information about the pulses and their timestamps
+with information about the syllable boundary timestamps.
+We can accomplish this by joining two dataframes based on whether the pulse
+timestamp is between the start and end timestamps of a particular interval.
+
+In this post, I'll show how this can be accomplished in R using the new non-equi 
+join functionality added to `{dplyr}` version 1.1.
+In the process, I'll also show off some tools from the `{rPraat}` package and
+the `{sosprosody}` package, which I am developing to support the analyses and
+data processing for my dissertation work.
+These packages provide some useful functionality for working with PitchTier
+and TextGrid objects from Praat.
+However, this functionality can also be accomplished through any non-equi join
+implementation.
+I'm familiar with the `{fuzzyjoin}` package, and [this post](https://www.r-bloggers.com/2021/02/the-unequalled-joy-of-non-equi-joins/)
+provides some additional options.
+
+::: {.callout-note}
+I am providing some resynthesized files here from my dissertation work, 
+currently they're not available publicly but will eventually be on the OSF
+as the work is published and presented. 
+I won't be discussing the details further in this post, but I'll note that the
+phone labels were returned by the [Montreal Forced Aligner](https://montreal-forced-aligner.readthedocs.io/en/latest/)
+and the syllable labels were hand coded.
+:::
+
+
+## Required packages
+
+See below code block for installation of the most relevant packages.
+`{dplyr}` must be version 1.1/the development version (as of this writing) to 
+allow for non-equi/fuzzy joins, and so is not (yet) part of a typical 
+installation of tidyverse.[^installnote]
+Refer to below code block for installation.
+
+[^installnote]: If you're having difficulties installing the development version, 
+there's a few things you can try. You can try restarting your R session, try
+separately updating any dependencies first (I needed to update `vctrs` separately),
+try removing dplyr entirely (`remove.packages('dplyr')`). If you're on windows
+and getting a permissions issue, try running R/RStudio as an administrator.
+
+```{r install-packages}
+#| eval: false
+
+# devtools or remotes can be used to install from github
+devtools::install_github("tidyverse/dplyr")
+install.packages('rPRaat')
+devtools::install_github('tsostarics/sosprosody')
+```
+
+Now we'll load the packages we'll be using.
+
+```{r load-packages}
+#| message: false
+library(dplyr)      # For joins
+library(rPraat)     # Read functions for textgrids and pitch tiers
+library(sosprosody) # Helpers for working with textgrids and pitch tiers
+
+# These two are part of any tidyverse installation
+library(ggplot2)    # For plotting
+library(purrr)      # For mapping functions
+```
+
+# Example with one file
+
+Our goal: Associate each pitch pulse with an interval on a tier from a TextGrid.
+
+The approach: Non-equi joins. Given a dataframe for the pitch pulses and a dataframe
+for a tier from a TextGrid, when a pitch pulse `timepoint` lies between 
+`interval_start` and `interval_end`, join `interval_start`, `interval_end`, and 
+the interval `label`.
+
+First we'll load our files, located in the `Files` directory.
+Because I'm working with just one example right now, I'll write the strings out
+directly.
+
+```{r}
+pt_file <- "Files/branning_1.PitchTier"
+tg_file <- "Files/branning_1.TextGrid"
+```
+
+Now we'll read the PitchTier and TextGrid files into R using `rPraat`.
+The `sosprosody` package provides new print methods for PitchTier and TextGrid
+objects, which can also be seen below (these would be displayed in the console).
+
+```{r load-praat-objs}
+# The default encoding is UTF-8, but there's a common 
+# case where Praat encodes files with UTF-16LE
+pt <- rPraat::pt.read(pt_file, encoding= "auto")
+tg <- rPraat::tg.read(tg_file, encoding = "auto")
+```
+
+```{r print-praat-objs}
+#| column: body-outset
+#| echo: false
+#| panel: center
+pt
+tg
+```
+
+Now that we have access to our PitchTier and TextGrid, we can convert them
+into data frame representations, again using `sosprosody`.
+We'll limit our scope right now to just the `phones` tier.
+
+```{r}
+# TextGrid as a a dataframe
+tiers <- sosprosody::textgrid_to_dataframes(tg) # List of dfs for each tier
+tier_df <- tiers$phones # Extract a single tier
+
+# Small post processing steps
+tier_df$file <- gsub(".TextGrid", "", tier_df$file, perl = TRUE)
+tier_df$interval_i <- seq_len(nrow(tier_df)) # Assign numeric indices
+head(tier_df)
+
+# Pitchtier as a dataframe, we don't need to calculate semitones and ERBs
+pt_df <- sosprosody::pitchtier_to_dataframe(pt, 
+                                            add_semitones = FALSE,
+                                            add_erbs = FALSE)
+head(pt_df)
+```
+
+Next we're going to use the new non-equi join functionality from `dplyr`.
+We want to match up the file in `tier_df` with the correct file in `pt_df`,
+then check for when the pulse timepoint (i.e., `pt_df$timepoint`) lies after
+`interval_start` and before `interval_end`.
+The choice of `>=` and `<` is largely arbitrary, you could do `>` and `<=` and
+get the same results unless you have pitch points that lie *exactly* on the 
+boundary.
+
+```{r}
+labeled_df <- 
+  left_join(pt_df, 
+            tier_df, 
+            join_by(file, 
+                    timepoint >= interval_start, 
+                    timepoint < interval_end))
+
+head(labeled_df)
+```
+
+To check our work, let's plot the pitch track to see what our result is like.
+Remember, we wanted to associate each pulse with the interval it appears in.
+
+```{r}
+labeled_df |> 
+  ggplot(aes(x = timepoint, y = hz, color = label, group = interval_i)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal(base_size = 14) +
+  # Add labels since there's a lot of colors
+  geom_label(data = summarize(group_by(labeled_df, label, interval_i),
+                              timepoint = median(timepoint),
+                              hz = median(hz) - 3),
+             aes(label = label)) +
+  theme(legend.position = 'none')
+
+```
+
+Looks great!
+Now we can adapt this same basic workflow of loading our Praat objects,
+converting to dataframes, and doing a non-equi join and apply it to all the
+files in a directory.
+Note that if you extracted F0 measurements using a method other than exporting
+PitchTier files from Praat, then you can still do all the same steps above but
+just omit the part where you read in the PitchTier files.
+Ultimately, all we're looking for is a dataframe that says what file(s) we have,
+what the pulse timepoints are, and what the frequency values at those timepoints
+are; how we get there doesn't really matter.
+
+# Example with multiple files
+
+Here's a pretty basic wrapper that encapsulates all of the previous steps into
+one function and operates over all the files in given directories containing
+TextGrids and PitchTiers.
+
+::: {.callout-caution}
+If I were to do this for a larger set of files, I would probably split this up
+into two parts where I first load all the files *then* join them together.
+The reason being that if there's an issue with joining the files in the below
+function, I would have to reload all the files *again* just to try the join again.
+Right now I'm only working with three files, so it doesn't matter too much.
+:::
+
+```{r helper}
+label_pitch_pulses <- function(textgrid_dir = "Files", 
+                               pitchtier_dir = "Files", 
+                               tier = 'phones') {
+  # Note: This will fail if each textgrid does not have a corresponding
+  #       pitch tier file in the pitchtier directory
+  textgrids <- list.files(textgrid_dir, 
+                          pattern = ".TextGrid$",
+                          full.names = TRUE)
+  pitchtiers <- gsub(".TextGrid$", ".PitchTier", textgrids, perl = TRUE)
+  
+  tg_dfs <- 
+    map_dfr(textgrids,
+            \(tg_path) {
+              tg <- rPraat::tg.read(tg_path, encoding = "auto")
+              tiers <- sosprosody::textgrid_to_dataframes(tg)
+              tier_df <- tiers[[tier]] 
+              
+              # Small post processing steps
+              tier_df$file <- gsub(".TextGrid", "", tier_df$file, perl = TRUE)
+              tier_df$interval_i <- seq_len(nrow(tier_df))
+              
+              tier_df
+            })
+  
+  pt_dfs <- 
+    map_dfr(pitchtiers,
+            \(pt_path) {
+              pt <- rPraat::pt.read(pt_path, encoding= "auto")
+              pt_df <- 
+                sosprosody::pitchtier_to_dataframe(pt, 
+                                                   add_semitones = FALSE,
+                                                   add_erbs = FALSE)
+              
+              pt_df
+            })
+  
+  # Execute the join
+  left_join(pt_dfs, 
+            tg_dfs, 
+            join_by(file, 
+                    timepoint >= interval_start, 
+                    timepoint < interval_end))
+  
+}
+```
+
+And now the helper can be used to process all of our files.
+If we needed to repeat this across, say, many production studies then this
+helper would save us a lot of copy-pasting.
+
+```{r}
+all_labeled_files <- label_pitch_pulses()
+```
+
+As before, we can plot the pitch contours for each of our files to check our work.
+
+```{r}
+all_labeled_files |> 
+  ggplot(aes(x = timepoint, y = hz, group = interval_i, color = label)) +
+  geom_line() +
+  geom_point(size = .5) +
+  facet_wrap(~file) +
+  theme_minimal(base_size = 14) +
+  geom_text(data = summarize(group_by(all_labeled_files, file, label, interval_i),
+                             timepoint = median(timepoint),
+                             hz = median(hz) - 4),
+            aes(label = label)) +
+  theme(legend.position = 'none') +
+  coord_fixed(1/50)
+```
+
+Next I'll show an example of how this might be useful beyond just labeling and
+coloring our pitch contours by interval.
+
+## Piecewise equal pulses
+
+This is an example using the `piecewise_interpolate_pulses` function[^pip] from
+`sosprosody` to get equally spaced pulses within each section.[^extract]
+Here I'll get 50 equally spaced pulses for each syllable in all of our words
+(which are all two syllables).
+
+[^pip]: For the interested, this function works by determining where the interval
+boundaries are located for each section as indexed by `section_by`. The
+timepoints, given by `time_by`, are then used to create a sequence of equally 
+spaces values (via `seq(from, to, length.out)`). For each new time value,
+the corresponding frequency is calculated via linear interpolation of the 
+adjacent pulse frequency values given by `.pitchval` (default is `"hz"`). This 
+is done separately for each group given by `.grouping` (default is `"file"`).
+
+[^extract]: Note that `piecewise_extract_pulses` is another similar function, 
+but will not allow for more pulses than what exists in the interval already.
+Additionally, that function extracts pulses based on modular arithmetic rather
+than linear interpolation, so any discontinuities are ignored in the result.
+
+::: {.callout-caution}
+At the time of this writing, a warning will be thrown since `reframe` was added 
+to dplyr to take over a deprecated functionality from `summarize`.
+I will fix this in the package at a later data after `dplyr` 1.1 is released. 
+The warning can be ignored though.
+:::
+
+```{r}
+# Switch to using syllable tier instead
+tier_df <- tiers$syllable
+
+# Small post processing steps
+tier_df$file <- gsub(".TextGrid", "", tier_df$file, perl = TRUE)
+tier_df$interval_i <- seq_len(nrow(tier_df))
+
+labeled_df2 <- 
+  left_join(pt_df, 
+            tier_df, 
+            join_by(file, 
+                    timepoint >= interval_start, 
+                    timepoint < interval_end))
+
+labeled_df2 |> 
+  dplyr::filter(label != "") |>  # Remove prenuclear material with blank label
+  # Get fifty equally spaced pulses by interval
+  sosprosody::piecewise_interpolate_pulses(section_by = "interval_i",
+                                           pulses_per_section = 50,
+                                           time_by = "timepoint",
+                                           .pitchval = "hz",
+                                           .grouping = "file") |> 
+  ggplot(aes(x = timepoint, y = hz, color= factor(interval_i), shape = interval_i)) +
+  geom_line() +
+  geom_point(size = 2) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = 'none') +
+  annotate(geom = "text",
+           x = c(.8, 1.1),
+           y = c(90, 90),
+           color = c('firebrick','dodgerblue4'),
+           label = c("Syl1","Syl2"),
+           size = 10) 
+
+```
+
+Moreover, `piecewise_interpolate_pulses` can be used to get a certain number
+of pulses *per section*.
+This allows you to upsample or downsample different parts of the utterance as
+needed (cf the above example upsampled across the board).
+Below, I'll get 10 pulses for the first section and 40 pulses for the 
+second.[^sylnote]
+
+[^sylnote]: Note that because the prenuclear material was associated with an unlabeled tier,
+the the relevant intervals for the first and second syllables are 2 and 3
+instead of 1 and 2.
+
+```{r}
+labeled_df2 |> 
+  dplyr::filter(label != "") |>  # Remove prenuclear material with blank label
+  # Get different numbers of pulses by interval
+  sosprosody::piecewise_interpolate_pulses(section_by = "interval_i",
+                                           pulses_per_section = c('2' = 10,
+                                                                  '3' = 40),
+                                           time_by = "timepoint",
+                                           .grouping = "file") |> 
+  ggplot(aes(x = timepoint, y = hz, color= factor(interval_i))) +
+  geom_line() +
+  geom_point(size = 2) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = 'none') +
+  annotate(geom = "text",
+           x = c(.8, 1.1),
+           y = c(90, 90),
+           color = c('firebrick','dodgerblue4'),
+           label = c("Syl1","Syl2"),
+           size = 10) 
+```
+
+And that's all!
+If you'd like to see a bigger example of how it might be useful to label regions
+of a pitch contour or extract equally spaced samples, you can take a look at
+the plots on 
+[this poster](https://www.tsostarics.com/research/2022_midphon/Sostarics-2022-Midphon.png).
+I've used this approach to extract less pulses from the prenuclear region
+of the utterance and more pulses from the nuclear region, then average multiple
+pitch contours across the extracted pulses.
