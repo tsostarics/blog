@@ -328,8 +328,7 @@ syllable_labeled_df <-
   rename(syllable = label)
 
 syllable_labeled_df |> 
-  # dplyr::filter(label != "") |>  # Remove prenuclear material with blank label
-  # Get fifty equally spaced pulses by interval
+  # Get fifty equally spaced pulses for each interval
   sosprosody::piecewise_interpolate_pulses(section_by = "syllable",
                                            pulses_per_section = 50,
                                            time_by = "timepoint",
@@ -339,7 +338,7 @@ syllable_labeled_df |>
   geom_line() +
   geom_point(size = 2) +
   theme_bw(base_size = 14) +
-  theme(legend.position = 'type') +
+  theme(legend.position = 'top') +
   facet_wrap(~file) +
   coord_fixed(1/50)
 
