@@ -59,7 +59,7 @@ currently they're not available publicly but will eventually be on the OSF
 as the work is published and presented. 
 I won't be discussing the details further in this post, but I'll note that the
 phone labels were returned by the [Montreal Forced Aligner](https://montreal-forced-aligner.readthedocs.io/en/latest/)
- (@mfa) and the syllable labels were hand coded.
+(@mfa) and the syllable labels were hand coded.
 :::
 
 
@@ -167,11 +167,11 @@ boundary.
 
 ```{r}
 labeled_df <- 
-  left_join(pt_df, 
-            tier_df, 
-            join_by(file, 
-                    timepoint >= interval_start, 
-                    timepoint < interval_end))
+  dplyr::left_join(pt_df, 
+                   tier_df, 
+                   join_by(file, 
+                           timepoint >= interval_start, 
+                           timepoint < interval_end))
 
 head(labeled_df)
 ```
@@ -402,7 +402,7 @@ values then have a range of $[0,1]$.
 # Time normalize by syllable
 syllable_labeled_df |> 
   group_by(file, interval_i) |> 
-  time_normalize(.to = 'time_norm') |> 
+  sosprosody::time_normalize(.to = 'time_norm') |> 
   sosprosody::piecewise_interpolate_pulses(section_by = "syllable",
                                            pulses_per_section = c('1' = 10,
                                                                   '2' = 40),
