@@ -4,7 +4,7 @@ author: "Thomas Sostarics"
 date: '2023-01-25'
 editor: source
 description: "This post discusses using non-equi joins to label pitch pulses by an interval on a TextGrid."
-# bibliography: mybib.bib
+bibliography: mybib.bib
 toc: true
 categories: ['R','Praat']
 code-tools: false
@@ -30,8 +30,8 @@ duration compared to if the first syllable is 60% of the time normalized duratio
 The problem then becomes two related problems: 
 
 1. How can we know which syllable a pulse appears in? (ie how to label the pulse with the syllable number)
-2. How can we assess a pulse's timestamp relative to the timestamp of the syllable
-boundaries it occurs with? (eg how far into the syllable does the pulse occur)
+2. How can we assess a pulse's timestamp relative to the syllable boundaries it occurs in? 
+(eg how far into the syllable does the pulse occur)
 
 As it happens, this problem becomes fairly straightforward when using [non-equi joins](https://www.w3resource.com/sql/joins/perform-a-non-equi-join.php).
 These are joins (left, right, etc.) that match not merely on equivalence matching,
@@ -59,7 +59,7 @@ currently they're not available publicly but will eventually be on the OSF
 as the work is published and presented. 
 I won't be discussing the details further in this post, but I'll note that the
 phone labels were returned by the [Montreal Forced Aligner](https://montreal-forced-aligner.readthedocs.io/en/latest/)
-and the syllable labels were hand coded.
+ (@mfa) and the syllable labels were hand coded.
 :::
 
 
@@ -99,7 +99,7 @@ library(ggplot2)    # For plotting
 library(purrr)      # For mapping functions
 ```
 
-# Example with one file
+## Example with one file
 
 Our goal: Associate each pitch pulse with an interval on a tier from a TextGrid.
 
@@ -129,7 +129,7 @@ tg <- rPraat::tg.read(tg_file, encoding = "auto")
 ```
 
 ```{r print-praat-objs}
-#| column: body-outset
+#| column: body-outset-right
 #| echo: false
 #| panel: center
 pt
@@ -184,7 +184,7 @@ labeled_df |>
   ggplot(aes(x = timepoint, y = hz, color = label, group = interval_i)) +
   geom_line() +
   geom_point() +
-  theme_minimal(base_size = 14) +
+  theme_bw(base_size = 14) +
   # Add labels since there's a lot of colors
   geom_label(data = summarize(group_by(labeled_df, label, interval_i),
                               timepoint = median(timepoint),
@@ -205,7 +205,7 @@ Ultimately, all we're looking for is a dataframe that says what file(s) we have,
 what the pulse timepoints are, and what the frequency values at those timepoints
 are; how we get there doesn't really matter.
 
-# Example with multiple files
+## Example with multiple files
 
 Here's a pretty basic wrapper that encapsulates all of the previous steps into
 one function and operates over all the files in given directories containing
@@ -266,24 +266,23 @@ label_pitch_pulses <- function(textgrid_dir = "Files",
 }
 ```
 
-And now the helper can be used to process all of our files.
-If we needed to repeat this across, say, many production studies then this
-helper would save us a lot of copy-pasting.
+And now the helper can be used to process all of our files; we'll use it again
+later when we start working with syllables instead of phones.
 
 ```{r}
-all_labeled_files <- label_pitch_pulses()
+phone_labeled_df <- label_pitch_pulses()
 ```
 
 As before, we can plot the pitch contours for each of our files to check our work.
 
 ```{r}
-all_labeled_files |> 
+phone_labeled_df |> 
   ggplot(aes(x = timepoint, y = hz, group = interval_i, color = label)) +
   geom_line() +
   geom_point(size = .5) +
   facet_wrap(~file) +
-  theme_minimal(base_size = 14) +
-  geom_text(data = summarize(group_by(all_labeled_files, file, label, interval_i),
+  theme_bw(base_size = 14) +
+  geom_text(data = summarize(group_by(phone_labeled_df, file, label, interval_i),
                              timepoint = median(timepoint),
                              hz = median(hz) - 4),
             aes(label = label)) +
@@ -322,39 +321,27 @@ The warning can be ignored though.
 :::
 
 ```{r}
-# Switch to using syllable tier instead
-tier_df <- tiers$syllable
 
-# Small post processing steps
-tier_df$file <- gsub(".TextGrid", "", tier_df$file, perl = TRUE)
-tier_df$interval_i <- seq_len(nrow(tier_df))
+syllable_labeled_df <- 
+  label_pitch_pulses(tier = 'syllable') |> 
+  dplyr::filter(interval_i != 1) |> 
+  rename(syllable = label)
 
-labeled_df2 <- 
-  left_join(pt_df, 
-            tier_df, 
-            join_by(file, 
-                    timepoint >= interval_start, 
-                    timepoint < interval_end))
-
-labeled_df2 |> 
-  dplyr::filter(label != "") |>  # Remove prenuclear material with blank label
+syllable_labeled_df |> 
+  # dplyr::filter(label != "") |>  # Remove prenuclear material with blank label
   # Get fifty equally spaced pulses by interval
-  sosprosody::piecewise_interpolate_pulses(section_by = "interval_i",
+  sosprosody::piecewise_interpolate_pulses(section_by = "syllable",
                                            pulses_per_section = 50,
                                            time_by = "timepoint",
                                            .pitchval = "hz",
                                            .grouping = "file") |> 
-  ggplot(aes(x = timepoint, y = hz, color= factor(interval_i), shape = interval_i)) +
+  ggplot(aes(x = timepoint, y = hz, color= syllable, shape = syllable)) +
   geom_line() +
   geom_point(size = 2) +
-  theme_minimal(base_size = 14) +
-  theme(legend.position = 'none') +
-  annotate(geom = "text",
-           x = c(.8, 1.1),
-           y = c(90, 90),
-           color = c('firebrick','dodgerblue4'),
-           label = c("Syl1","Syl2"),
-           size = 10) 
+  theme_bw(base_size = 14) +
+  theme(legend.position = 'type') +
+  facet_wrap(~file) +
+  coord_fixed(1/50)
 
 ```
 
@@ -370,26 +357,71 @@ the the relevant intervals for the first and second syllables are 2 and 3
 instead of 1 and 2.
 
 ```{r}
-labeled_df2 |> 
-  dplyr::filter(label != "") |>  # Remove prenuclear material with blank label
+syllable_labeled_df |> 
   # Get different numbers of pulses by interval
-  sosprosody::piecewise_interpolate_pulses(section_by = "interval_i",
-                                           pulses_per_section = c('2' = 10,
-                                                                  '3' = 40),
+  sosprosody::piecewise_interpolate_pulses(section_by = "syllable",
+                                           pulses_per_section = c('1' = 10,
+                                                                  '2' = 40),
                                            time_by = "timepoint",
                                            .grouping = "file") |> 
-  ggplot(aes(x = timepoint, y = hz, color= factor(interval_i))) +
+  ggplot(aes(x = timepoint,
+             y = hz,
+             group = file,
+             color = syllable, 
+             shape = syllable)) +
   geom_line() +
   geom_point(size = 2) +
-  theme_minimal(base_size = 14) +
-  theme(legend.position = 'none') +
-  annotate(geom = "text",
-           x = c(.8, 1.1),
-           y = c(90, 90),
-           color = c('firebrick','dodgerblue4'),
-           label = c("Syl1","Syl2"),
-           size = 10) 
+  theme_bw(base_size = 14) +
+  theme(legend.position = 'top')
 ```
+
+In the above plot, we can tell that at least one of the files have a pitch 
+contour that starts a bit later than the others given the raw time on the x
+axis.
+This arises due to the slightly longer prenuclear material present in that
+utterance (the other two files were resynthesized from the same source file).
+We can time normalize these files such that the first syllable from each
+contour is directly comparable, i.e., they'll all start at 0 and end at 1.
+And we can do that separately for the second syllable too.
+It's more typical to time normalize by the duration of an entire word or
+utterance, but we'll work with a more narrow case of time normalizing within
+each syllable.
+We address this problem with with much of the tools we've already used so far.
+Below I use the `time_normalize` function from `sosprosody`, which is a 
+convenience wrapper that does the subtraction and division operations for
+time normalizing.[^timenorm]
+
+[^timenorm]: For those unfamiliar, the general algorithm is: For each interval
+$i$ with boundary timepoints $t_{i,start}$ and $t_{i,end}$, for each pulse in
+that interval with timepoints $t_{i,j}$, do $t_{i,j}-t_{i,start}$ to get shifted
+timepoints $t'_{i,j}$. Then do $t_{i,end}-t_{i,start}$ to get shifted end time
+$t'_{i,end}$. Then divide all of $t'_{i,j}$ by $t'_{i,end}$. The resulting
+values then have a range of $[0,1]$.
+
+```{r}
+# Time normalize by syllable
+syllable_labeled_df |> 
+  group_by(file, interval_i) |> 
+  time_normalize(.to = 'time_norm') |> 
+  sosprosody::piecewise_interpolate_pulses(section_by = "syllable",
+                                           pulses_per_section = c('1' = 10,
+                                                                  '2' = 40),
+                                           time_by = "time_norm",
+                                           .grouping = "file") |> 
+  ggplot(aes(x = time_norm,
+             y = hz,
+             group = file,
+             color = syllable, 
+             shape = syllable)) +
+  geom_line() +
+  geom_point(size = 2) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = 'top') +
+  facet_wrap(~syllable) +
+  coord_fixed(1/50)
+
+```
+
 
 And that's all!
 If you'd like to see a bigger example of how it might be useful to label regions
@@ -399,3 +431,8 @@ the plots on
 I've used this approach to extract less pulses from the prenuclear region
 of the utterance and more pulses from the nuclear region, then average multiple
 pitch contours across the extracted pulses.
+
+```{r}
+sessionInfo()
+```
+
