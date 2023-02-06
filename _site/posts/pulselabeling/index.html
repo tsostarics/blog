@@ -417,7 +417,7 @@ Note
 <span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'none'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="pulse_labeling_files/figure-html/plot-labels-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/plot-labels-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Looks great! Now we can adapt this same basic workflow of loading our Praat objects, converting to dataframes, and doing a non-equi join and apply it to all the files in a directory. Note that if you extracted F0 measurements using a method other than exporting PitchTier files from Praat, then you can still do all the same steps above but just omit the part where you read in the PitchTier files. Ultimately, all we’re looking for is a dataframe that says what file(s) we have, what the pulse timepoints are, and what the frequency values at those timepoints are; how we get there doesn’t really matter.</p>
@@ -512,7 +512,7 @@ Tip
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_fixed</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">50</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="pulse_labeling_files/figure-html/plot-all-file-labels-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/plot-all-file-labels-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Next I’ll show an example of how this might be useful beyond just labeling and coloring our pitch contours by interval.</p>
@@ -544,7 +544,7 @@ Tip
 <span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_fixed</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">50</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="pulse_labeling_files/figure-html/plot-syllable-labels-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/plot-syllable-labels-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Moreover, <code>piecewise_interpolate_pulses</code> can be used to get a certain number of pulses <em>per section</em>. This allows you to upsample or downsample different parts of the utterance as needed (cf the above example upsampled across the board). Below, I’ll get 10 pulses for the first section and 40 pulses for the second.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></p>
@@ -569,7 +569,7 @@ Tip
 <span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'top'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="pulse_labeling_files/figure-html/interpolate-by-syllable-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/interpolate-by-syllable-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>In the above plot, we can tell that at least one of the files have a pitch contour that starts a bit later than the others given the raw time on the x axis. This arises due to the slightly longer prenuclear material present in that utterance (the other two files were resynthesized from the same source file). We can time normalize these files such that the first syllable from each contour is directly comparable, i.e., they’ll all start at 0 and end at 1. And we can do that separately for the second syllable too. It’s more typical to time normalize by the duration of an entire word or utterance, but we’ll work with a more narrow case of time normalizing within each syllable. We address this problem with with much of the tools we’ve already used so far. Below I use the <code>time_normalize</code> function from <code>sosprosody</code>, which is a convenience wrapper that does the subtraction and division operations for time normalizing.<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a></p>
@@ -598,7 +598,7 @@ Tip
 <span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_fixed</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">50</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="pulse_labeling_files/figure-html/timenorm-syllable-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/timenorm-syllable-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>And that’s all! If you’d like to see a bigger example of how it might be useful to label regions of a pitch contour or extract equally spaced samples, you can take a look at the plots on <a href="https://www.tsostarics.com/research/2022_midphon/Sostarics-2022-Midphon.png">this poster</a>. I’ve used this approach to extract less pulses from the prenuclear region of the utterance and more pulses from the nuclear region, then average multiple pitch contours across the extracted pulses.</p>
@@ -667,12 +667,12 @@ McAuliffe, Michael, Michaela Socolof, Sarah Mihuc, Michael Wagner, and Morgan So
   author = {Thomas Sostarics},
   title = {Pulse {Labeling}},
   date = {2023-01-25},
-  url = {https://tsostaricsblog.netlify.app/posts/pulselabeling/pulse_labeling.html},
+  url = {https://tsostaricsblog.netlify.app/posts/pulselabeling},
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-sostarics2023" class="csl-entry quarto-appendix-citeas" role="doc-biblioentry">
 Thomas Sostarics. 2023. <span>“Pulse Labeling.”</span> January 25, 2023.
-<a href="https://tsostaricsblog.netlify.app/posts/pulselabeling/pulse_labeling.html">https://tsostaricsblog.netlify.app/posts/pulselabeling/pulse_labeling.html</a>.
+<a href="https://tsostaricsblog.netlify.app/posts/pulselabeling">https://tsostaricsblog.netlify.app/posts/pulselabeling</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {

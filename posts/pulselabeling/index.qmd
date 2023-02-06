@@ -1,7 +1,13 @@
 ---
 title: "Pulse Labeling"
-author: "Thomas Sostarics"
+author: 
+ - name: Thomas Sostarics
+ - url: https://tsostarics.com/
+ - affiliation: Northwestern University Department of Linguistics
+ - orcid: 0000-0002-1178-7967
 date: '2023-01-25'
+citation:
+  url: https://tsostaricsblog.netlify.app/posts/pulselabeling
 editor: source
 description: "This post discusses using non-equi joins to label pitch pulses by an interval on a TextGrid."
 bibliography: mybib.bib
@@ -42,7 +48,7 @@ We can accomplish this by joining two dataframes based on whether the pulse
 timestamp is between the start and end timestamps of a particular interval.
 
 In this post, I'll show how this can be accomplished in R using the new non-equi 
-join functionality added to `{dplyr}` version 1.1.
+join functionality added to `{dplyr}` version 1.1.[^vernote]
 In the process, I'll also show off some tools from the `{rPraat}` package and
 the `{sosprosody}` package, which I am developing to support the analyses and
 data processing for my dissertation work.
@@ -52,6 +58,14 @@ However, this functionality can also be accomplished through any non-equi join
 implementation.
 I'm familiar with the `{fuzzyjoin}` package, and [this post](https://www.r-bloggers.com/2021/02/the-unequalled-joy-of-non-equi-joins/)
 provides some additional options.
+
+[^vernote]: Dev note: dplyr 1.1 is only needed here for the non-equi joins, the `{sosprosody}`
+package doesn't require it. There was a change in the behavior of
+`dplyr::summarize` when `dplyr::reframe` was introduced, but `sosprosody` will 
+check whether `reframe` is exported by the currently installed `dplyr` namespace
+when the package is loaded. For the general reader, this means my package will
+work regardless of version without spitting out numerous warnings if you have
+already upgraded.
 
 ::: {.callout-note}
 I am providing some resynthesized files here from my dissertation work, 
@@ -112,7 +126,7 @@ First we'll load our files, located in the `Files` directory.
 Because I'm working with just one example right now, I'll write the strings out
 directly.
 
-```{r}
+```{r set-filenames}
 pt_file <- "Files/branning_1.PitchTier"
 tg_file <- "Files/branning_1.TextGrid"
 ```
@@ -140,7 +154,7 @@ Now that we have access to our PitchTier and TextGrid, we can convert them
 into data frame representations, again using `sosprosody`.
 We'll limit our scope right now to just the `phones` tier.
 
-```{r}
+```{r process-praat-objs}
 # TextGrid as a a dataframe
 tiers <- sosprosody::textgrid_to_dataframes(tg) # List of dfs for each tier
 tier_df <- tiers$phones # Extract a single tier
@@ -165,7 +179,7 @@ The choice of `>=` and `<` is largely arbitrary, you could do `>` and `<=` and
 get the same results unless you have pitch points that lie *exactly* on the 
 boundary.
 
-```{r}
+```{r join-dataframes}
 labeled_df <- 
   dplyr::left_join(pt_df, 
                    tier_df, 
@@ -179,7 +193,7 @@ head(labeled_df)
 To check our work, let's plot the pitch track to see what our result is like.
 Remember, we wanted to associate each pulse with the interval it appears in.
 
-```{r}
+```{r plot-labels}
 labeled_df |> 
   ggplot(aes(x = timepoint, y = hz, color = label, group = interval_i)) +
   geom_line() +
@@ -269,13 +283,13 @@ label_pitch_pulses <- function(textgrid_dir = "Files",
 And now the helper can be used to process all of our files; we'll use it again
 later when we start working with syllables instead of phones.
 
-```{r}
+```{r execute-label-pulses}
 phone_labeled_df <- label_pitch_pulses()
 ```
 
 As before, we can plot the pitch contours for each of our files to check our work.
 
-```{r}
+```{r plot-all-file-labels}
 phone_labeled_df |> 
   ggplot(aes(x = timepoint, y = hz, group = interval_i, color = label)) +
   geom_line() +
@@ -313,15 +327,8 @@ but will not allow for more pulses than what exists in the interval already.
 Additionally, that function extracts pulses based on modular arithmetic rather
 than linear interpolation, so any discontinuities are ignored in the result.
 
-::: {.callout-tip}
-At the time of this writing, a warning will be thrown since `reframe` was added 
-to dplyr to take over a deprecated functionality from `summarize`.
-I will fix this in the package at a later data after `dplyr` 1.1 is released. 
-The warning can be ignored though.
-:::
 
-```{r}
-
+```{r plot-syllable-labels}
 syllable_labeled_df <- 
   label_pitch_pulses(tier = 'syllable') |> 
   dplyr::filter(interval_i != 1) |> 
@@ -355,7 +362,7 @@ second.[^sylnote]
 the the relevant intervals for the first and second syllables are 2 and 3
 instead of 1 and 2.
 
-```{r}
+```{r interpolate-by-syllable}
 syllable_labeled_df |> 
   # Get different numbers of pulses by interval
   sosprosody::piecewise_interpolate_pulses(section_by = "syllable",
@@ -397,7 +404,7 @@ timepoints $t'_{i,j}$. Then do $t_{i,end}-t_{i,start}$ to get shifted end time
 $t'_{i,end}$. Then divide all of $t'_{i,j}$ by $t'_{i,end}$. The resulting
 values then have a range of $[0,1]$.
 
-```{r}
+```{r timenorm-syllable}
 # Time normalize by syllable
 syllable_labeled_df |> 
   group_by(file, interval_i) |> 
@@ -431,7 +438,7 @@ I've used this approach to extract less pulses from the prenuclear region
 of the utterance and more pulses from the nuclear region, then average multiple
 pitch contours across the extracted pulses.
 
-```{r}
+```{r session-info}
 sessionInfo()
 ```
 

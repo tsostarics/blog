@@ -1,7 +1,13 @@
 ---
 title: "Contrastable"
-author: "Thomas Sostarics"
+author: 
+ - name: Thomas Sostarics
+ - url: https://tsostarics.com/
+ - affiliation: Northwestern University Department of Linguistics
+ - orcid: 0000-0002-1178-7967
 date: '2022-07-13'
+citation:
+  url: https://tsostaricsblog.netlify.app/posts/contrastable/
 editor: source
 description: "This post gives an overview of an R package I've written. The contrastable package provides a tidy approach to contrast coding for regression analyses."
 bibliography: mybib.bib
