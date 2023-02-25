@@ -428,6 +428,162 @@ syllable_labeled_df |>
 
 ```
 
+### Handling overlapping pulses
+
+There is one edge case that is worth mentioning: when a pitch pulse lines up
+exactly on the edge between boundaries.
+This can especially happen when using something like the montreal forced
+aligner to set textgrid tier boundaries; the boundaries may be placed
+in steps of 10 milliseconds, which might be the same step with which 
+pitch samples are returned.
+For example, say we have 20 pitch pulses from time 0 to 1, and this timespan
+is broken up into two sections from 0 to .5 and .5 to 1.
+If we want to label the pulses by which section they occur in, what do we do
+with a pulse that falls exactly at .5?
+Is it part of the first section? Or the second?
+Previously we addressed this in our non-equi join, associating such a point
+with the first section by joining on $min(sec_t) <= t < max(sec_t)$.
+We could have associated it with the second section by joining on
+$min(sec_t) < t <= max(sec_t)$.
+But if we joined on $min(sec_t) <= t <= max(sec_t)$, then the time $t$ at .5
+would be duplicated, as there would be a point at .5 at the very end of the
+first section and another point at .5 at the very start of the second section.
+
+Here's an example of what I mean with three sections.
+When all the sections are plotted together, the shared timepoints overlap.
+
+```{r plot-overlap-schematic}
+#| layout-nrow: 2
+#| code-fold: true
+
+overlapping_df <- 
+  data.frame(file = 'file1',
+             section = c(rep('a', times = 2),
+                         rep('b', times = 2),
+                         rep('c', times = 2)),
+             timestamp = c(seq(0,1,length.out = 2),
+                           seq(1, 1.4, length.out = 2),
+                           seq(1.4, 2, length.out = 2)),
+             hz = c(seq(90, 110, length.out = 2),
+                    seq(110, 70, length.out = 2),
+                    seq(70, 60, length.out = 2)))
+overlap_plot <- 
+  overlapping_df |> 
+  ggplot(aes(x = timestamp, y = hz, color = section, shape = section)) +
+  geom_line() +
+  geom_point(size = 3, aes(shape = section, fill = section),color ='black') +
+  scale_shape_manual(values = c(21, 22, 24)) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = 'top')
+
+overlap_plot
+
+overlap_plot + 
+  facet_grid(~section) + 
+  theme(legend.position = 'none')
+```
+
+This situation causes some sticky situations when using the output of
+`piecewise_interpolate_pulses`; specifically, if you're plotting or modeling
+using the resulting pulse indices.
+Below I interpolate 15 equally spaced points for each section, then
+plot by pulse index.
+We can see that for those points that overlapped, we get some regions
+that are flat, which should not be there.
+
+```{r plot-overlapping-pulses}
+#| code-fold: true
+overlap_pulses <- 
+  overlapping_df |> 
+  piecewise_interpolate_pulses(section_by = 'section',
+                               pulses_per_section = 15,
+                               time_by = 'timestamp',
+                               .grouping = 'file')
+
+overlap_pulses |> 
+  ggplot(aes(x = pulse_i, y = hz)) +
+  annotate(xmin = 14.5,
+           xmax = 16.5,
+           ymin = 108,
+           ymax = 112,
+           geom = 'rect',
+           fill = 'red',
+           alpha = .4) +
+  annotate(xmin = 29.5,
+           xmax = 31.5,
+           ymin = 68,
+           ymax = 72,
+           geom = 'rect',
+           fill = 'red',
+           alpha = .4) +
+  geom_line() +
+  geom_point(size = 3, aes(shape = section, fill = section)) +
+  scale_shape_manual(values = c(21, 22, 24)) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = 'top') +
+  coord_fixed(1/2)
+```
+
+I've provided a post-processing function that can fix this (in case it's too
+much trouble to try and go back and fix the original textgrids or join
+operations).
+For each instance where two adjacent pulses share the same timestamp, you can
+choose to keep either the *left* pulse (equivalent to if we had joined using
+$min(sec_t) < t <= max(sec_t)$) or the *right* pulse (=if we had joined using 
+$min(sec_t) <= t < max(sec_t)$).
+
+```{r plot-removed-overlaps}
+#| layout-nrow: 2
+#| code-fold: true
+adjusted_df_l <- 
+  overlap_pulses |> 
+  drop_overlapping_pulses(keep = 'left',
+                          time_by = 'timestamp',
+                          pulse_col = 'pulse_i',
+                          .grouping = 'file')
+
+adjusted_df_r <- 
+  overlap_pulses |> 
+  drop_overlapping_pulses(keep = 'right',
+                          time_by = 'timestamp',
+                          pulse_col = 'pulse_i',
+                          .grouping = 'file')
+
+
+keep_left_plot <- 
+  adjusted_df_l |> 
+  ggplot(aes(x = pulse_i, y = hz)) +
+  geom_line() +
+  geom_point(size = 3, aes(shape = section, fill = section)) +
+  scale_shape_manual(values = c(21, 22, 24)) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = 'top') +
+  coord_fixed(1/2)
+
+keep_right_plot <- 
+  adjusted_df_r |> 
+  ggplot(aes(x = pulse_i, y = hz)) +
+  geom_line() +
+  geom_point(size = 3, aes(shape = section, fill = section)) +
+  scale_shape_manual(values = c(21, 22, 24)) +
+  theme_bw(base_size = 14) +
+  theme(legend.position = 'none') +
+  coord_fixed(1/2)
+
+keep_left_plot
+keep_right_plot
+```
+
+Note that we originally extracted 15 pulses for
+each section, but deleted one from each section that contained an overlap.
+As a result, the number of pulses for our three sections are not 15, 15, 15
+but now 15, 14, 14 (if we kept the left pulse) or 14, 14, 15 (if we kept the
+right pulse).
+If we want to have 15 for everything in the output, then we'd need to
+specify `pulses_per_section` in `piecewise_interpolate_pulses` to be either
+`c(15, 16, 16)` or `c(16, 16, 15)` depending on which pulse we intend to keep
+with `drop_overlapping_pulses`.
+
 
 And that's all!
 If you'd like to see a bigger example of how it might be useful to label regions

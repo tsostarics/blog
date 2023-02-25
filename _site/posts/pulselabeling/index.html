@@ -232,7 +232,10 @@ div.csl-indent {
   <li><a href="#required-packages" id="toc-required-packages" class="nav-link active" data-scroll-target="#required-packages">Required packages</a></li>
   <li><a href="#example-with-one-file" id="toc-example-with-one-file" class="nav-link" data-scroll-target="#example-with-one-file">Example with one file</a></li>
   <li><a href="#example-with-multiple-files" id="toc-example-with-multiple-files" class="nav-link" data-scroll-target="#example-with-multiple-files">Example with multiple files</a></li>
-  <li><a href="#piecewise-equal-pulses" id="toc-piecewise-equal-pulses" class="nav-link" data-scroll-target="#piecewise-equal-pulses">Piecewise equal pulses</a></li>
+  <li><a href="#piecewise-equal-pulses" id="toc-piecewise-equal-pulses" class="nav-link" data-scroll-target="#piecewise-equal-pulses">Piecewise equal pulses</a>
+  <ul class="collapse">
+  <li><a href="#handling-overlapping-pulses" id="toc-handling-overlapping-pulses" class="nav-link" data-scroll-target="#handling-overlapping-pulses">Handling overlapping pulses</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -601,11 +604,150 @@ Tip
 <p><img src="index_files/figure-html/timenorm-syllable-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<section id="handling-overlapping-pulses" class="level3">
+<h3 class="anchored" data-anchor-id="handling-overlapping-pulses">Handling overlapping pulses</h3>
+<p>There is one edge case that is worth mentioning: when a pitch pulse lines up exactly on the edge between boundaries. This can especially happen when using something like the montreal forced aligner to set textgrid tier boundaries; the boundaries may be placed in steps of 10 milliseconds, which might be the same step with which pitch samples are returned. For example, say we have 20 pitch pulses from time 0 to 1, and this timespan is broken up into two sections from 0 to .5 and .5 to 1. If we want to label the pulses by which section they occur in, what do we do with a pulse that falls exactly at .5? Is it part of the first section? Or the second? Previously we addressed this in our non-equi join, associating such a point with the first section by joining on <span class="math inline">\(min(sec_t) &lt;= t &lt; max(sec_t)\)</span>. We could have associated it with the second section by joining on <span class="math inline">\(min(sec_t) &lt; t &lt;= max(sec_t)\)</span>. But if we joined on <span class="math inline">\(min(sec_t) &lt;= t &lt;= max(sec_t)\)</span>, then the time <span class="math inline">\(t\)</span> at .5 would be duplicated, as there would be a point at .5 at the very end of the first section and another point at .5 at the very start of the second section.</p>
+<p>Here’s an example of what I mean with three sections. When all the sections are plotted together, the shared timepoints overlap.</p>
+<div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>overlapping_df <span class="ot">&lt;-</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">file =</span> <span class="st">'file1'</span>,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">section =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">'a'</span>, <span class="at">times =</span> <span class="dv">2</span>),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">rep</span>(<span class="st">'b'</span>, <span class="at">times =</span> <span class="dv">2</span>),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">rep</span>(<span class="st">'c'</span>, <span class="at">times =</span> <span class="dv">2</span>)),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">timestamp =</span> <span class="fu">c</span>(<span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">length.out =</span> <span class="dv">2</span>),</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">seq</span>(<span class="dv">1</span>, <span class="fl">1.4</span>, <span class="at">length.out =</span> <span class="dv">2</span>),</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">seq</span>(<span class="fl">1.4</span>, <span class="dv">2</span>, <span class="at">length.out =</span> <span class="dv">2</span>)),</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">hz =</span> <span class="fu">c</span>(<span class="fu">seq</span>(<span class="dv">90</span>, <span class="dv">110</span>, <span class="at">length.out =</span> <span class="dv">2</span>),</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">seq</span>(<span class="dv">110</span>, <span class="dv">70</span>, <span class="at">length.out =</span> <span class="dv">2</span>),</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">seq</span>(<span class="dv">70</span>, <span class="dv">60</span>, <span class="at">length.out =</span> <span class="dv">2</span>)))</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>overlap_plot <span class="ot">&lt;-</span> </span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  overlapping_df <span class="sc">|&gt;</span> </span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> timestamp, <span class="at">y =</span> hz, <span class="at">color =</span> section, <span class="at">shape =</span> section)) <span class="sc">+</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="fu">aes</span>(<span class="at">shape =</span> section, <span class="at">fill =</span> section),<span class="at">color =</span><span class="st">'black'</span>) <span class="sc">+</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">22</span>, <span class="dv">24</span>)) <span class="sc">+</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'top'</span>)</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>overlap_plot</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>overlap_plot <span class="sc">+</span> </span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="sc">~</span>section) <span class="sc">+</span> </span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'none'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
+<p><img src="index_files/figure-html/plot-overlap-schematic-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
+<p><img src="index_files/figure-html/plot-overlap-schematic-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<p>This situation causes some sticky situations when using the output of <code>piecewise_interpolate_pulses</code>; specifically, if you’re plotting or modeling using the resulting pulse indices. Below I interpolate 15 equally spaced points for each section, then plot by pulse index. We can see that for those points that overlapped, we get some regions that are flat, which should not be there.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>overlap_pulses <span class="ot">&lt;-</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  overlapping_df <span class="sc">|&gt;</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">piecewise_interpolate_pulses</span>(<span class="at">section_by =</span> <span class="st">'section'</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">pulses_per_section =</span> <span class="dv">15</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">time_by =</span> <span class="st">'timestamp'</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">.grouping =</span> <span class="st">'file'</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>overlap_pulses <span class="sc">|&gt;</span> </span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> pulse_i, <span class="at">y =</span> hz)) <span class="sc">+</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="at">xmin =</span> <span class="fl">14.5</span>,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">xmax =</span> <span class="fl">16.5</span>,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">ymin =</span> <span class="dv">108</span>,</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">ymax =</span> <span class="dv">112</span>,</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>           <span class="at">geom =</span> <span class="st">'rect'</span>,</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> <span class="st">'red'</span>,</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>           <span class="at">alpha =</span> .<span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="at">xmin =</span> <span class="fl">29.5</span>,</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>           <span class="at">xmax =</span> <span class="fl">31.5</span>,</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>           <span class="at">ymin =</span> <span class="dv">68</span>,</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">ymax =</span> <span class="dv">72</span>,</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>           <span class="at">geom =</span> <span class="st">'rect'</span>,</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> <span class="st">'red'</span>,</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>           <span class="at">alpha =</span> .<span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="fu">aes</span>(<span class="at">shape =</span> section, <span class="at">fill =</span> section)) <span class="sc">+</span></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">22</span>, <span class="dv">24</span>)) <span class="sc">+</span></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'top'</span>) <span class="sc">+</span></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_fixed</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/plot-overlapping-pulses-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>I’ve provided a post-processing function that can fix this (in case it’s too much trouble to try and go back and fix the original textgrids or join operations). For each instance where two adjacent pulses share the same timestamp, you can choose to keep either the <em>left</em> pulse (equivalent to if we had joined using <span class="math inline">\(min(sec_t) &lt; t &lt;= max(sec_t)\)</span>) or the <em>right</em> pulse (=if we had joined using <span class="math inline">\(min(sec_t) &lt;= t &lt; max(sec_t)\)</span>).</p>
+<div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>adjusted_df_l <span class="ot">&lt;-</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  overlap_pulses <span class="sc">|&gt;</span> </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_overlapping_pulses</span>(<span class="at">keep =</span> <span class="st">'left'</span>,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">time_by =</span> <span class="st">'timestamp'</span>,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pulse_col =</span> <span class="st">'pulse_i'</span>,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">.grouping =</span> <span class="st">'file'</span>)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>adjusted_df_r <span class="ot">&lt;-</span> </span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  overlap_pulses <span class="sc">|&gt;</span> </span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_overlapping_pulses</span>(<span class="at">keep =</span> <span class="st">'right'</span>,</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">time_by =</span> <span class="st">'timestamp'</span>,</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pulse_col =</span> <span class="st">'pulse_i'</span>,</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">.grouping =</span> <span class="st">'file'</span>)</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>keep_left_plot <span class="ot">&lt;-</span> </span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>  adjusted_df_l <span class="sc">|&gt;</span> </span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> pulse_i, <span class="at">y =</span> hz)) <span class="sc">+</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="fu">aes</span>(<span class="at">shape =</span> section, <span class="at">fill =</span> section)) <span class="sc">+</span></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">22</span>, <span class="dv">24</span>)) <span class="sc">+</span></span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'top'</span>) <span class="sc">+</span></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_fixed</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>keep_right_plot <span class="ot">&lt;-</span> </span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>  adjusted_df_r <span class="sc">|&gt;</span> </span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> pulse_i, <span class="at">y =</span> hz)) <span class="sc">+</span></span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="fu">aes</span>(<span class="at">shape =</span> section, <span class="at">fill =</span> section)) <span class="sc">+</span></span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">22</span>, <span class="dv">24</span>)) <span class="sc">+</span></span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'none'</span>) <span class="sc">+</span></span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_fixed</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>keep_left_plot</span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>keep_right_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
+<p><img src="index_files/figure-html/plot-removed-overlaps-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
+<p><img src="index_files/figure-html/plot-removed-overlaps-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<p>Note that we originally extracted 15 pulses for each section, but deleted one from each section that contained an overlap. As a result, the number of pulses for our three sections are not 15, 15, 15 but now 15, 14, 14 (if we kept the left pulse) or 14, 14, 15 (if we kept the right pulse). If we want to have 15 for everything in the output, then we’d need to specify <code>pulses_per_section</code> in <code>piecewise_interpolate_pulses</code> to be either <code>c(15, 16, 16)</code> or <code>c(16, 16, 15)</code> depending on which pulse we intend to keep with <code>drop_overlapping_pulses</code>.</p>
 <p>And that’s all! If you’d like to see a bigger example of how it might be useful to label regions of a pitch contour or extract equally spaced samples, you can take a look at the plots on <a href="https://www.tsostarics.com/research/2022_midphon/Sostarics-2022-Midphon.png">this poster</a>. I’ve used this approach to extract less pulses from the prenuclear region of the utterance and more pulses from the nuclear region, then average multiple pitch contours across the extracted pulses.</p>
 <div class="cell">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.2.2 (2022-10-31 ucrt)
@@ -646,6 +788,7 @@ loaded via a namespace (and not attached):
 
 
 
+</section>
 </section>
 
 
