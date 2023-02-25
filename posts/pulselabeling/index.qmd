@@ -431,7 +431,7 @@ syllable_labeled_df |>
 ### Handling overlapping pulses
 
 There is one edge case that is worth mentioning: when a pitch pulse lines up
-exactly on the edge between boundaries.
+exactly on the boundary between sections (i.e., intervals on a textgrid)
 This can especially happen when using something like the montreal forced
 aligner to set textgrid tier boundaries; the boundaries may be placed
 in steps of 10 milliseconds, which might be the same step with which 
