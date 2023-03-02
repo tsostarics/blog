@@ -407,11 +407,12 @@ values then have a range of $[0,1]$.
 ```{r timenorm-syllable}
 # Time normalize by syllable
 syllable_labeled_df |> 
-  group_by(file, interval_i) |> 
+  group_by(file) |> 
   sosprosody::time_normalize(.to = 'time_norm') |> 
   sosprosody::piecewise_interpolate_pulses(section_by = "syllable",
                                            pulses_per_section = c('1' = 10,
                                                                   '2' = 40),
+                                           index_column = 'interval_i',
                                            time_by = "time_norm",
                                            .grouping = "file") |> 
   ggplot(aes(x = time_norm,
