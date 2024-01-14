@@ -1,0 +1,393 @@
+---
+title: "On Helmert Coding"
+format: html
+self-contained: true
+author: 
+ - name: Thomas Sostarics
+ - url: https://tsostarics.com/
+ - affiliation: Northwestern University Department of Linguistics
+ - orcid: 0000-0002-1178-7967
+date: '2024-01-14'
+citation:
+  url: https://tsostaricsblog.netlify.app/posts/helmert
+editor: source
+description: "This post discusses the behavior of Helmert contrasts."
+toc: true
+categories: ['R']
+code-tools: true
+code-fold: show
+---
+
+I've had many discussions with colleagues over the past year about helmert 
+contrasts, and I've decided to compile some of my notes here.
+This post discusses helmert coding, which is a type of contrast coding scheme where comparisons are made in a "nesting" fashion.
+However, there are different ways to represent these nested comparisons in a contrast matrix.
+Their corresponding hypothesis matrices simplify to the same statistical test, but the coefficient estimates have different magnitudes.
+These magnitudes differ by a scaling factor, which I will show how to derive.
+As a result, the statistical inference drawn will be the same whether the matrix is scaled or unscaled, but using the coefficient magnitude at face-value for something else (e.g., claims about differences in reaction time, future power analyses) will be misleading.
+
+I will include various exercises throughout this document that you can do yourself
+to better understand what's going in.
+
+
+## What is Helmert Coding?
+
+Helmert coding is a type of contrast coding scheme that *nests levels together* for some of the comparisons.
+This is most evident when using a factor with more than 2 levels.[^1]
+
+At an abstract level, let's say you have four groups `A`, `B`, `C`, and `D` which allots you 3 comparisons (`n-1` degrees of freedom).
+Helmert coding allows you to compare the means of levels `A` and `B` ($\mu_B - \mu_A$) for your first comparison, then the mean of level `C` compared to the mean of levels `A` and `B` ($\mu_C - \frac{\mu_A +\mu_B}{2}$), then finally the mean of level `D` compared to the mean of levels `A`, `B`, `C` ($\mu_D - \frac{\mu_A +\mu_B + \mu_C}{3}$).
+
+To give an example, let's say you're interested in comparing the duration of `d`, `n`, `s`, and `sh` word initially in words like *dough, no, so, show*.
+We have four levels, so we get three comparisons.
+We *could* pick a baseline level and compare the other two levels to it, but there's a natural *structure* to these levels: they are all coronal sounds[^2] but three are continuants and two are sibilants[^3] (one compact (s) and the other diffuse (sh) ).
+So, we could compare the two sibilants together (`sh-s`) and then have another comparison between nasals and sibilants (`n-sib=n-(s+sh)`), then a final comparison between continuant coronals and a coronal stop.
+Thus, we have a comparison where two of the comparisons contain nested parts of the data.
+What we want to see is some statistical test for these comparisons, which themselves are just differences between means.
+We'll see that in some versions of Helmert coding, this is a little off.
+
+
+[^1]: See my other post on contrast coding [here](https://tsostaricsblog.netlify.app/posts/contrastable/), where I show how many contrast coding schemes yield the same contrast matrix for 2-level factors.
+[^2]: Coronal sounds are made with tongue constrictions somewhere between the alveolar ridge (the bump behind your teeth) and the hard palate.
+[^3]: Sibilants are s-like sounds, in English we have s (as in hisssssss) and sh (as in wissssshhhhh). S is *compact* in that its energy is compacted to a high frequency band around 8-10kHz, while sh is *diffuse* because its energy is spread out across a larger frequency range, making it sound more "fuzzy" like white noise.
+
+
+Helmert coding is also useful for another reason: the comparisons are mathematically *orthogonal* to one another, meaning that the comparisons are independent of one another. 
+Read more about this [here](https://www.southampton.ac.uk/~cpd/anovas/datasets/Orthogonal%20contrasts.htm#:~:text=Orthogonal%20contrasts,at%20least%20three%20fixed%20levels.) and [here](https://online.stat.psu.edu/stat505/lesson/8/8.6).
+
+## Issue with contr.helmert
+
+One issue with the `contr.helmert` function provided in all installations of R
+via the stats package though is that the resulting coefficient estimates don't
+straightforwardly encode the differences between means.
+Rather, the results are *scaled* by some multiplicative factor.
+We'll build up to this with a toy example.
+
+```{r}
+#| message: false
+library(dplyr)
+set.seed(111)
+# Create random data for 4 groups with specified means
+my_data <- data.frame(grp = factor(c(rep(c('A', 'B', 'C', 'D'),
+                                         each = 2000))),
+                      val = c(rnorm(2000, 1, .25),
+                              rnorm(2000, 5, .25),
+                              rnorm(2000, 10, .25),
+                              rnorm(2000, 17, .25)))
+```
+
+In this first code block we've created four groups with very narrowly defined
+means. 
+We can extract the means of our simulated data like so:
+
+```{r}
+group_means <-
+  my_data |>
+  split(~grp) |> 
+  vapply(\(grp_data) mean(grp_data$val), 1.0, USE.NAMES = TRUE)
+
+group_means
+```
+
+Now what we want to do is run a linear model to compute helmert-coded comparisons.
+Specifically what we want are these differences:
+
+ - `B - A`
+ - `C - mean(B + A)`
+ - `D - mean(C + B + A)`
+ 
+ 
+We can compute these differences manually ourselves so we can verify that the
+model is working as expected.
+
+:::{.callout-note}
+
+## ***Exercise 1***
+
+Using a piece of paper or R, try to manually calculate what the above
+differences would be.
+Refer to to code block where we created our toy dataset for the mean values
+we used for each group.
+The answers are shown below using the `group_means` vector we defined.
+
+:::
+
+```{r}
+# B vs A: mean(B) - mean(A): ~~ 5 - 1 ==> 4
+group_means['B'] - group_means['A']
+
+# C vs A+B: mean(C) - mean(A, B): ~~ 10 - mean(1, 5) ==> 7
+group_means['C'] - mean(c(group_means['B'],
+                          group_means['A']))
+
+# D vs A+B+C: mean(D) - mean(A, B, C): ~~ 16 - mean(1, 5, 10) ==> 11.67
+group_means['D'] - mean(c(group_means['A'],
+                          group_means['B'],
+                          group_means['C']))
+```
+
+So these are the values we should be looking out for in our model.
+Let's use the `contrastable` package ([see here](https://github.com/tsostarics/contrastable)) 
+to set contrasts moving forward.
+This will allow us to set labels easily and swap out contrast schemes.
+
+```{r}
+library(contrastable)
+coded_data1 <-
+  set_contrasts(my_data, grp ~ contr.helmert | c("AvsB", "CvsAB", "DvsABC"))
+
+set.seed(111)
+model_1_coefs <- coef(lm(val ~ grp, data = coded_data1))
+
+model_1_coefs
+```
+
+Take a moment to compare the results from the model above to the manual 
+calculations we did.
+Are these values the same? (no, they are not)
+All of the values returned by the model are smaller than what we expect.
+These coefficient values need to be rescaled to get the correct values.
+If you want to try to figure out how much each value needs to be multiplied
+yourself, take a moment to compare the manual calculations to the model output.
+
+We can scale the values like so:
+
+```{r}
+model_1_coefs * (1:4)
+```
+
+So, the intercept (which is the grand mean) is fine, but the 2nd coefficient
+was off by a factor of 2, the 3rd by a factor of 3, and the 4th by 4.
+This is kind of a pain to remember to do, and most people I talk to don't
+realize this needs to be done.
+We can get an idea for a solution from the contrast matrix:
+
+```{r}
+contr.helmert(4)
+```
+
+For those just learning about contrast coding (or, if you're more familiar with
+advanced topics, try to think of the most basic matrices), it's a bit surprising
+to see a value like 3 there.
+`contr.treatment` and `contr.sum` are all 0s, 1s, and -1s, and sometimes you'll 
+see people use fractions like $\pm0.5$-- a 3 is a bit out of place.
+But therein lies the solution: this contrast matrix needs to be scaled.
+Recall that the coefficients encoding the comparisons were off by factors of
+2, 3, and 4.
+We can scale each column of the matrix using those values:
+
+```{r}
+new_matrix <- contr.helmert(4)
+new_matrix[,1] <- new_matrix[,1]/2
+new_matrix[,2] <- new_matrix[,2]/3
+new_matrix[,3] <- new_matrix[,3]/4
+
+# Alternatively something like:
+# apply(stats::contr.helmert(4), 2L, \(x) x / sum(x != 0))
+
+new_matrix
+```
+
+We can use that new matrix to set the contrasts like before, rather than
+using `contr.helmert`:
+
+```{r}
+coded_data2 <- 
+  set_contrasts(my_data, grp ~ new_matrix | c("AvsB", "CvsAB", "DvsABC"))
+
+
+set.seed(111)
+model_2_coefs <- coef(lm(val ~ grp, data = coded_data2))
+
+model_2_coefs
+```
+
+Now the values are exactly what we expected!
+But it was a bit annoying to have to remember to either multiply the output
+values or divide the input values.
+The `contrastable` package provides a version of helmert coding that already
+scaled the matrix appropriately.
+
+```{r}
+helmert_code(4)
+
+coded_data3 <- 
+  set_contrasts(my_data, grp ~ helmert_code | c("AvsB", "CvsAB", "DvsABC"))
+
+
+set.seed(111)
+model_3_coefs <- coef(lm(val ~ grp, data = coded_data3))
+
+model_3_coefs
+```
+
+At this point, if you're a researcher who has used `contr.helmert` in a
+published analysis and you didn't know about all the scaling nonsense, I'm sure 
+your stomach has sunk and your heart rate is elevated.
+On your mind is probably *"but do the p values change??"*.
+They don't, so take a deep breath and we'll look at the full model output.
+Flip through the tabs below and you'll see that the t values and p values
+are exactly the same.
+
+::: {.panel-tabset}
+
+## With `contr.helmert()`
+```{r}
+set.seed(111)
+summary(lm(val ~ grp, data = coded_data1))
+```
+
+## With `helmert_code()`
+
+```{r}
+set.seed(111)
+summary(lm(val ~ grp, data = coded_data3))
+```
+
+:::
+
+So the statistical tests are the same yet the coefficients are different.
+What does this mean for your previous findings?
+If you concluded an effect with a particular direction based on the sign of
+the coefficient, then that conclusion still holds.[^4]
+The signs of the coefficient values are the same, it's just the magnitude of
+the coefficient estimates that's off when using `contr.helmert`.
+However, if you made a claim about the **strength** of an effect, then you
+should revisit your analysis.
+For example, let's say you run a self paced reading task and conclude that
+not only are reading times longer in one condition vs the nesting of two others,
+but in fact the penalty is the same size as some previous effect.
+You actually probably undersold this result, as it should have been multiplied
+by three.
+But on a theoretical basis, the comparison you made to some other effect/process
+may not hold (because this process is actually 3x more "powerful").[^5]
+Moreover, future work using your effect estimate as a basis for future
+meta analyses of followup experiments would be a bit misguided.
+This might look suspicious later on if the experiment is replicated but somehow 
+the  effect is three times larger than what you reported.
+
+ [^4]: Let's withhold meta-level discussion about what constitutes an effect,
+ decisions based on p-value criteria, replicability, etc. This is all outside
+ the scope of this post.
+ [^5]: Let's say the coefficient you got is `+0.05` on the log scale, which 
+ is equivalent to a `5.1%` slowdown between conditions. If the effect is 
+ actually supposed to be `+0.15`, it's still a slowdown but it's actually a
+ `16.1%` slowdown!
+ 
+## Helmert contrasts and factor orders
+
+Helmert coding provides comparisons with a "nested" structure of the factor
+levels.
+The nesting proceeds from the first level towards the last level, but this
+doesn't have to be the case.
+
+:::{.callout-note}
+
+## ***Exercise 2***
+
+Try running the previous code block using `reverse_helmert_code` instead of
+`helmert_code`.
+Answer the following questions:
+
+ 1. How did the contrast matrix change?
+ 2. How did the model output change?
+ 3. What do the coefficients correspond to? Use the approach we did previously
+ with the `group_means` vector to figure out what difference each comparison
+ corresponds to.
+ 4. Given your observations from the above questions, the labels we used before
+ (`c("AvsB", "CvsAB", "DvsABC")`) no longer apply. What other kinds of labels
+ might you use instead? Try adding labels in the `set_contrasts()` call using
+ the `|` operator (the label-setting operator).
+
+:::
+
+It's important to remember that R will automatically set the indices of each
+level to their alphabetical order.
+We can change this behavior by explicitly setting what the levels of a factor are
+*in the order we want the factor to use*.
+That is, rather than `A`, `B`, `C`, `D` being assigned numeric indices underlying
+the factor of 1, 2, 3, 4, we want these assigned indices to be different.
+If you're wondering why I wrote the previous clunky sentence, it's because it's
+worth mentioning that R differentiates between unordered and ordered factors.
+What we want here is NOT an ordered factor with a particular order, but
+an UNORDERED factor with the levels indexed in a particular order.
+Ordered factors by default use orthogonal polynomial contrasts (`contr.poly`),
+which is not at all what we want right now.[^6]
+
+
+ [^6]: You can see what the default contrasts are using `options()$contrasts`
+
+Why does all this alphabetical order-but-not-*ordered* nonsense matter?
+Recall that Helmert coding nests from one level to another: either the
+first to the last or the last to the first.
+If these are not already in the order we want them to be nested in, then we need
+to put in some work to match things up like we want.
+Let's say we actually want the ordering to be `A`, `C`, `B`, `D`/
+We can set the order by setting the `levels` parameter of the `factor()` 
+function.
+ 
+```{r}
+coded_data4 <- 
+  my_data |> 
+  mutate(grp = factor(grp, levels = c("A", "C", "B", "D"))) |> 
+  set_contrasts(grp ~ helmert_code)
+
+
+set.seed(111)
+model_4_coefs <- coef(lm(val ~ grp, data = coded_data4))
+
+model_4_coefs
+```
+
+The last thing I'll touch upon is the edge case of contrast coding: factors
+with only 2 levels.
+I discuss this at length in my other blog post [here](https://tsostaricsblog.netlify.app/posts/contrastable/), but the main point
+is that many contrast coding schemes are equivalent to one another when
+there are only 2 levels.
+In particular, helmert coding will give you $\pm0.5$, but so would sum coding
+that's been scaled by 2 (`contr.sum(2)/2` is not uncommon to see in analysis scripts)
+or successive difference coding or... many other things.
+But this equivalence does not hold when there are more than 2 levels.
+This divergence is why it's important to be explicit about exactly what your
+comparisons are trying to describe in the context of the analysis.
+If the goal is to compare one level to a baseline, then for 2 levels basically
+any contrast scheme (modulo sign and multiplicative factor) would give you that 
+information.
+But if that's the goal for a followup that "just adds another level", then suddenly
+using helmert coding vs sum coding will give very different insights for that new
+comparison.
+
+# Takeaways
+
+ - Helmert coding is useful for categorical variables where the comparisons have
+ a nested structure to them.
+ - The coefficients of `contr.helmert` need to be scaled to recover the actual
+ differences of interest.
+ - The statistical tests for scaled and unscaled helmert matrices are exactly
+ the same: the differences are only in the magnitude of the effects.
+ - Care should be taken in correctly setting up the nesting structure.
+ 
+
+:::{.callout-note}
+
+## ***Final Exercise***
+
+ 1. Select another type of contrast coding scheme other than Helmert coding,
+ for example, `contr.sum`. Compare the matrices for 2 levels and for 4 levels.
+ How do the matrices differ? What kinds of comparisons are encoded by the
+ scheme you selected?
+ 2. Consider your field or your own research. Come up with an example of a
+ categorical variable that can be construed as having a nested structure. How
+ should the levels be ordered to get the nesting structure right? Come up with
+ fake means for each level; can you predict what the correct signs for the
+ coefficients would be? See the intro for an example from segmental phonology.
+ 3. A researcher has written the following sentence in their paper:
+ "We fit a linear mixed effects model in R to our data, with all categorical
+ variables using helmert coding."
+ Given the examples from this post and your own observations, what additional
+ information would you want the researcher to share in order to be able to
+ interpret their results correctly? Moreover, *where* would you want this
+ information to be shared? In the preceding sentence? In the following sentence?
+ An appendix? A footnote?
+
+:::

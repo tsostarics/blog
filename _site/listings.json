@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/helmert/helmert_post.html",
       "/posts/pulselabeling/index.html",
       "/posts/contrastable/index.html"
     ]

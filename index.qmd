@@ -1,5 +1,6 @@
 ---
 title: "Posts"
+subtitle: "Updates sporadically!"
 listing:
   contents: posts
   sort: "date desc"
