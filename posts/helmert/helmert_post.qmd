@@ -120,7 +120,7 @@ group_means['B'] - group_means['A']
 group_means['C'] - mean(c(group_means['B'],
                           group_means['A']))
 
-# D vs A+B+C: mean(D) - mean(A, B, C): ~~ 16 - mean(1, 5, 10) ==> 11.67
+# D vs A+B+C: mean(D) - mean(A, B, C): ~~ 17 - mean(1, 5, 10) ==> 11.67
 group_means['D'] - mean(c(group_means['A'],
                           group_means['B'],
                           group_means['C']))
