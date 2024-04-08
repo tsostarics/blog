@@ -5,7 +5,7 @@ author:
  - url: https://tsostarics.com/
  - affiliation: Northwestern University Department of Linguistics
  - orcid: 0000-0002-1178-7967
-date: '2024-07-13'
+date: '2024-04-07'
 editor: source
 description: "A quick reference for musical notes and their corresponding frequencies and wavelengths."
 categories: ['Reference']
