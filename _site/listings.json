@@ -2,10 +2,10 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/notefreqs/index.html",
       "/posts/helmert/index.html",
       "/posts/pulselabeling/index.html",
-      "/posts/contrastable/index.html",
-      "/posts/notefreqs/index.html"
+      "/posts/contrastable/index.html"
     ]
   }
 ]

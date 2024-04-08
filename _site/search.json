@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Posts",
     "section": "",
-    "text": "On Helmert Coding\n\n\n\n\n\n\nR\n\n\n\nThis post discusses the behavior of Helmert contrasts.\n\n\n\n\n\nJan 14, 2024\n\n\nThomas Sostarics\n\n\n\n\n\n\n\n\n\n\n\n\nPulse Labeling\n\n\n\n\n\n\nR\n\n\nPraat\n\n\n\nThis post discusses using non-equi joins to label pitch pulses by an interval on a TextGrid.\n\n\n\n\n\nJan 25, 2023\n\n\nThomas Sostarics\n\n\n\n\n\n\n\n\n\n\n\n\nContrastable\n\n\n\n\n\n\nR pkg\n\n\n\nThis post gives an overview of an R package I’ve written. The contrastable package provides a tidy approach to contrast coding for regression analyses.\n\n\n\n\n\nJul 13, 2022\n\n\nThomas Sostarics\n\n\n\n\n\n\n\n\n\n\n\n\nNote Frequencies\n\n\n\n\n\n\nReference\n\n\n\nA quick reference for musical notes and their corresponding frequencies and wavelengths.\n\n\n\n\n\nJul 13, 2022\n\n\nThomas Sostarics\n\n\n\n\n\n\nNo matching items"
+    "text": "Note Frequencies\n\n\n\n\n\n\nReference\n\n\n\nA quick reference for musical notes and their corresponding frequencies and wavelengths.\n\n\n\n\n\nApr 7, 2024\n\n\nThomas Sostarics\n\n\n\n\n\n\n\n\n\n\n\n\nOn Helmert Coding\n\n\n\n\n\n\nR\n\n\n\nThis post discusses the behavior of Helmert contrasts.\n\n\n\n\n\nJan 14, 2024\n\n\nThomas Sostarics\n\n\n\n\n\n\n\n\n\n\n\n\nPulse Labeling\n\n\n\n\n\n\nR\n\n\nPraat\n\n\n\nThis post discusses using non-equi joins to label pitch pulses by an interval on a TextGrid.\n\n\n\n\n\nJan 25, 2023\n\n\nThomas Sostarics\n\n\n\n\n\n\n\n\n\n\n\n\nContrastable\n\n\n\n\n\n\nR pkg\n\n\n\nThis post gives an overview of an R package I’ve written. The contrastable package provides a tidy approach to contrast coding for regression analyses.\n\n\n\n\n\nJul 13, 2022\n\n\nThomas Sostarics\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/contrastable/index.html",
@@ -172,7 +172,7 @@
     "href": "posts/notefreqs/index.html",
     "title": "Note Frequencies",
     "section": "",
-    "text": "I’ve had Bryan Suits’ website bookmarked for years specifically for the page on converting musical notes to frequencies and wavelengths. I have learned that he has sadly passed away recently, and Michigan Tech removed his website in the process. This is a recreation of the page I had bookmarked."
+    "text": "I’ve had Bryan Suits’ website bookmarked for years specifically for the page on converting musical notes to frequencies and wavelengths. I have learned that he has sadly passed away recently, and Michigan Tech removed his website in the process. This is a recreation of the table on his website, mostly so I can access it again more easily."
   },
   {
     "objectID": "posts/notefreqs/index.html#frequencies-for-equal-tempered-scale",
