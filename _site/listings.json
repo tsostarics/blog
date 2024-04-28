@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/latexswitch/index.html",
       "/posts/notefreqs/index.html",
       "/posts/helmert/index.html",
       "/posts/pulselabeling/index.html",

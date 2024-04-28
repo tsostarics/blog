@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -19,9 +19,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -48,48 +49,19 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+/* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
 }
-.hanging div.csl-entry {
+.hanging-indent div.csl-entry {
   margin-left:2em;
   text-indent:-2em;
 }
@@ -103,8 +75,7 @@ div.csl-right-inline {
 }
 div.csl-indent {
   margin-left: 2em;
-}
-</style>
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -141,7 +112,8 @@ div.csl-indent {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -155,35 +127,35 @@ div.csl-indent {
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-sm navbar-dark ">
       <div class="navbar-container container-fluid">
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://tsostarics.com/"><i class="bi bi-house-door" role="img">
+    <a class="nav-link" href="https://tsostarics.com/" rel="" target=""><i class="bi bi-house-door" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="https://www.tsostarics.com/about/">
+    <a class="nav-link" href="https://www.tsostarics.com/about/" rel="" target="">
  <span class="menu-text">ABOUT</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://tsostaricsblog.netlify.app">
+    <a class="nav-link" href="https://tsostaricsblog.netlify.app" rel="" target="">
  <span class="menu-text">POSTS</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://www.tsostarics.com/research/">
+    <a class="nav-link" href="https://www.tsostarics.com/research/" rel="" target="">
  <span class="menu-text">RESEARCH</span></a>
   </li>  
 </ul>
-              <div class="quarto-toggle-container">
-                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
-              </div>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
@@ -235,12 +207,12 @@ div.csl-indent {
 <li>Show how the <code>contrastable</code> package can be used to sidestep mistakes caused by error-prone and tedious calls to <code>contrasts&lt;-</code>.</li>
 <li>Briefly link to other packages on contrasts and level comparisons.</li>
 </ul>
-<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-caption-container flex-fill">
+<div class="callout-title-container flex-fill">
 Where to find contrastable
 </div>
 </div>
@@ -256,12 +228,12 @@ Where to find contrastable
 <h2 class="anchored" data-anchor-id="contrasts-overview">Contrasts overview</h2>
 <p>Contrast coding refers to assigning numeric values to levels of a categorical variable for use in regression analyses. Depending on the numbers used, different comparisons can be made between the group means of a variable. These comparisons can correspond to particular null hypotheses that a researcher might have, and particular combinations of numbers can encode high-level questions like “Are there differences between levels when compared to a common reference level?” or “Does each level differ from the levels that came before it?” Critically, the contrasts used don’t impact the model fit but do impact the coefficient estimates that are used to make inferences about the data. For example, you might conclude that there’s an overall effect of some factor when in reality the effect (shown by the coefficient estimate) is an effect that only holds for one particular group!</p>
 <p>Consider an example where you have two groups of listeners where English is their native (L1) or non-native (L2) language. You might be interested in whether reading times are slower or faster in two different syntactic conditions, such as active vs passive constructions. Two possible research questions might be whether there’s an <em>main</em> effect of syntax on reading times on the one hand or whether there’s a <em>simple</em> effect such that reading times in the passive construction are only slower for L2 speakers.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> These are similar, but different, research questions and more importantly, the interpretation of one coefficient depends on how <em>other</em> variables are coded. Many researchers realize (or are starting to at least) that the default<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> “0/1 contrasts” (aka treatment or dummy coding) will only give them the simple effect of structure, but if what you’re interested in is that <em>main</em> effect, then your statistics has not yet answered your question! To rectify this, researchers will opt for “the +.5/-.5 contrasts” to obtain main effects.</p>
-<div class="callout-warning callout callout-style-default callout-captioned">
+<div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-caption-container flex-fill">
+<div class="callout-title-container flex-fill">
 Warning: Naming inconsistency
 </div>
 </div>
@@ -273,7 +245,7 @@ Warning: Naming inconsistency
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(contrastable)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="panel-tabset">
+<div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">2 levels</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">3 levels</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">5 levels</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
@@ -383,12 +355,12 @@ Gentoo            0      1</code></pre>
 </details>
 </div>
 <p>The chance of making a mistake increases when including more and more categorical variables. Catching these mistakes can be very difficult, in part because this workflow erases the labels in the regression output. This means you have to keep track of what <code>1</code> and <code>2</code> in the regression coefficients correspond to.</p>
-<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-caption-container flex-fill">
+<div class="callout-title-container flex-fill">
 Note: Column/Comparison/Coefficient names
 </div>
 </div>
@@ -627,7 +599,7 @@ male   -1/2  </code></pre>
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-:where(#hufffsodos) .gt_table {
+#hufffsodos .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -652,7 +624,7 @@ male   -1/2  </code></pre>
   border-left-color: #D3D3D3;
 }
 
-:where(#hufffsodos) .gt_heading {
+#hufffsodos .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -664,12 +636,12 @@ male   -1/2  </code></pre>
   border-right-color: #D3D3D3;
 }
 
-:where(#hufffsodos) .gt_caption {
+#hufffsodos .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-:where(#hufffsodos) .gt_title {
+#hufffsodos .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -681,7 +653,7 @@ male   -1/2  </code></pre>
   border-bottom-width: 0;
 }
 
-:where(#hufffsodos) .gt_subtitle {
+#hufffsodos .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -693,13 +665,13 @@ male   -1/2  </code></pre>
   border-top-width: 0;
 }
 
-:where(#hufffsodos) .gt_bottom_border {
+#hufffsodos .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-:where(#hufffsodos) .gt_col_headings {
+#hufffsodos .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -714,7 +686,7 @@ male   -1/2  </code></pre>
   border-right-color: #D3D3D3;
 }
 
-:where(#hufffsodos) .gt_col_heading {
+#hufffsodos .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -734,7 +706,7 @@ male   -1/2  </code></pre>
   overflow-x: hidden;
 }
 
-:where(#hufffsodos) .gt_column_spanner_outer {
+#hufffsodos .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -746,15 +718,15 @@ male   -1/2  </code></pre>
   padding-right: 4px;
 }
 
-:where(#hufffsodos) .gt_column_spanner_outer:first-child {
+#hufffsodos .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-:where(#hufffsodos) .gt_column_spanner_outer:last-child {
+#hufffsodos .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-:where(#hufffsodos) .gt_column_spanner {
+#hufffsodos .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -766,7 +738,7 @@ male   -1/2  </code></pre>
   width: 100%;
 }
 
-:where(#hufffsodos) .gt_group_heading {
+#hufffsodos .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -792,7 +764,7 @@ male   -1/2  </code></pre>
   text-align: left;
 }
 
-:where(#hufffsodos) .gt_empty_group_heading {
+#hufffsodos .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -807,15 +779,15 @@ male   -1/2  </code></pre>
   vertical-align: middle;
 }
 
-:where(#hufffsodos) .gt_from_md > :first-child {
+#hufffsodos .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-:where(#hufffsodos) .gt_from_md > :last-child {
+#hufffsodos .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-:where(#hufffsodos) .gt_row {
+#hufffsodos .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -834,7 +806,7 @@ male   -1/2  </code></pre>
   overflow-x: hidden;
 }
 
-:where(#hufffsodos) .gt_stub {
+#hufffsodos .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -847,7 +819,7 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-:where(#hufffsodos) .gt_stub_row_group {
+#hufffsodos .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -861,11 +833,11 @@ male   -1/2  </code></pre>
   vertical-align: top;
 }
 
-:where(#hufffsodos) .gt_row_group_first td {
+#hufffsodos .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-:where(#hufffsodos) .gt_summary_row {
+#hufffsodos .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -875,16 +847,16 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-:where(#hufffsodos) .gt_first_summary_row {
+#hufffsodos .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-:where(#hufffsodos) .gt_first_summary_row.thick {
+#hufffsodos .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-:where(#hufffsodos) .gt_last_summary_row {
+#hufffsodos .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -894,7 +866,7 @@ male   -1/2  </code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-:where(#hufffsodos) .gt_grand_summary_row {
+#hufffsodos .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -904,7 +876,7 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-:where(#hufffsodos) .gt_first_grand_summary_row {
+#hufffsodos .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -914,11 +886,11 @@ male   -1/2  </code></pre>
   border-top-color: #D3D3D3;
 }
 
-:where(#hufffsodos) .gt_striped {
+#hufffsodos .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-:where(#hufffsodos) .gt_table_body {
+#hufffsodos .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -927,7 +899,7 @@ male   -1/2  </code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-:where(#hufffsodos) .gt_footnotes {
+#hufffsodos .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -941,7 +913,7 @@ male   -1/2  </code></pre>
   border-right-color: #D3D3D3;
 }
 
-:where(#hufffsodos) .gt_footnote {
+#hufffsodos .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-left: 4px;
@@ -950,7 +922,7 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-:where(#hufffsodos) .gt_sourcenotes {
+#hufffsodos .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -964,7 +936,7 @@ male   -1/2  </code></pre>
   border-right-color: #D3D3D3;
 }
 
-:where(#hufffsodos) .gt_sourcenote {
+#hufffsodos .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -972,118 +944,123 @@ male   -1/2  </code></pre>
   padding-right: 5px;
 }
 
-:where(#hufffsodos) .gt_left {
+#hufffsodos .gt_left {
   text-align: left;
 }
 
-:where(#hufffsodos) .gt_center {
+#hufffsodos .gt_center {
   text-align: center;
 }
 
-:where(#hufffsodos) .gt_right {
+#hufffsodos .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-:where(#hufffsodos) .gt_font_normal {
+#hufffsodos .gt_font_normal {
   font-weight: normal;
 }
 
-:where(#hufffsodos) .gt_font_bold {
+#hufffsodos .gt_font_bold {
   font-weight: bold;
 }
 
-:where(#hufffsodos) .gt_font_italic {
+#hufffsodos .gt_font_italic {
   font-style: italic;
 }
 
-:where(#hufffsodos) .gt_super {
+#hufffsodos .gt_super {
   font-size: 65%;
 }
 
-:where(#hufffsodos) .gt_footnote_marks {
+#hufffsodos .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
 }
 
-:where(#hufffsodos) .gt_asterisk {
+#hufffsodos .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-:where(#hufffsodos) .gt_indent_1 {
+#hufffsodos .gt_indent_1 {
   text-indent: 5px;
 }
 
-:where(#hufffsodos) .gt_indent_2 {
+#hufffsodos .gt_indent_2 {
   text-indent: 10px;
 }
 
-:where(#hufffsodos) .gt_indent_3 {
+#hufffsodos .gt_indent_3 {
   text-indent: 15px;
 }
 
-:where(#hufffsodos) .gt_indent_4 {
+#hufffsodos .gt_indent_4 {
   text-indent: 20px;
 }
 
-:where(#hufffsodos) .gt_indent_5 {
+#hufffsodos .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
-<table class="gt_table">
-  
-  <thead class="gt_col_headings">
-    <tr>
-      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="factor">factor</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="n_levels">n_levels</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="level_names">level_names</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="scheme">scheme</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="reference">reference</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="intercept">intercept</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="orthogonal">orthogonal</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="centered">centered</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="dropped_trends">dropped_trends</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="explicitly_set">explicitly_set</th>
-    </tr>
-  </thead>
-  <tbody class="gt_table_body">
-    <tr><td headers="factor" class="gt_row gt_left">sex</td>
-<td headers="n_levels" class="gt_row gt_right">2</td>
-<td headers="level_names" class="gt_row gt_center">female, male</td>
-<td headers="scheme" class="gt_row gt_left">scaled_sum_code</td>
-<td headers="reference" class="gt_row gt_left">female</td>
-<td headers="intercept" class="gt_row gt_left">grand mean</td>
-<td headers="orthogonal" class="gt_row gt_center">NA</td>
-<td headers="centered" class="gt_row gt_center">TRUE</td>
-<td headers="dropped_trends" class="gt_row gt_left">NA</td>
-<td headers="explicitly_set" class="gt_row gt_center">TRUE</td></tr>
-    <tr><td headers="factor" class="gt_row gt_left">species</td>
-<td headers="n_levels" class="gt_row gt_right">3</td>
-<td headers="level_names" class="gt_row gt_center">Adelie, Chinstrap, Gentoo</td>
-<td headers="scheme" class="gt_row gt_left">helmert_code</td>
-<td headers="reference" class="gt_row gt_left">Gentoo</td>
-<td headers="intercept" class="gt_row gt_left">grand mean</td>
-<td headers="orthogonal" class="gt_row gt_center">TRUE</td>
-<td headers="centered" class="gt_row gt_center">TRUE</td>
-<td headers="dropped_trends" class="gt_row gt_left">NA</td>
-<td headers="explicitly_set" class="gt_row gt_center">TRUE</td></tr>
-    <tr><td headers="factor" class="gt_row gt_left">island</td>
-<td headers="n_levels" class="gt_row gt_right">3</td>
-<td headers="level_names" class="gt_row gt_center">Biscoe, Dream, Torgersen</td>
-<td headers="scheme" class="gt_row gt_left">contr.treatment</td>
-<td headers="reference" class="gt_row gt_left">Biscoe</td>
-<td headers="intercept" class="gt_row gt_left">mean(Biscoe)</td>
-<td headers="orthogonal" class="gt_row gt_center">FALSE</td>
-<td headers="centered" class="gt_row gt_center">FALSE</td>
-<td headers="dropped_trends" class="gt_row gt_left">NA</td>
-<td headers="explicitly_set" class="gt_row gt_center">FALSE</td></tr>
-  </tbody>
-  
-  
+
+<table class="gt_table table table-sm table-striped small" data-quarto-postprocess="true">
+<thead class="gt_col_headings">
+<tr class="header">
+<th id="factor" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">factor</th>
+<th id="n_levels" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">n_levels</th>
+<th id="level_names" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">level_names</th>
+<th id="scheme" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">scheme</th>
+<th id="reference" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">reference</th>
+<th id="intercept" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">intercept</th>
+<th id="orthogonal" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">orthogonal</th>
+<th id="centered" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">centered</th>
+<th id="dropped_trends" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">dropped_trends</th>
+<th id="explicitly_set" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">explicitly_set</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="factor">sex</td>
+<td class="gt_row gt_right" headers="n_levels">2</td>
+<td class="gt_row gt_center" headers="level_names">female, male</td>
+<td class="gt_row gt_left" headers="scheme">scaled_sum_code</td>
+<td class="gt_row gt_left" headers="reference">female</td>
+<td class="gt_row gt_left" headers="intercept">grand mean</td>
+<td class="gt_row gt_center" headers="orthogonal">NA</td>
+<td class="gt_row gt_center" headers="centered">TRUE</td>
+<td class="gt_row gt_left" headers="dropped_trends">NA</td>
+<td class="gt_row gt_center" headers="explicitly_set">TRUE</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="factor">species</td>
+<td class="gt_row gt_right" headers="n_levels">3</td>
+<td class="gt_row gt_center" headers="level_names">Adelie, Chinstrap, Gentoo</td>
+<td class="gt_row gt_left" headers="scheme">helmert_code</td>
+<td class="gt_row gt_left" headers="reference">Gentoo</td>
+<td class="gt_row gt_left" headers="intercept">grand mean</td>
+<td class="gt_row gt_center" headers="orthogonal">TRUE</td>
+<td class="gt_row gt_center" headers="centered">TRUE</td>
+<td class="gt_row gt_left" headers="dropped_trends">NA</td>
+<td class="gt_row gt_center" headers="explicitly_set">TRUE</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="factor">island</td>
+<td class="gt_row gt_right" headers="n_levels">3</td>
+<td class="gt_row gt_center" headers="level_names">Biscoe, Dream, Torgersen</td>
+<td class="gt_row gt_left" headers="scheme">contr.treatment</td>
+<td class="gt_row gt_left" headers="reference">Biscoe</td>
+<td class="gt_row gt_left" headers="intercept">mean(Biscoe)</td>
+<td class="gt_row gt_center" headers="orthogonal">FALSE</td>
+<td class="gt_row gt_center" headers="centered">FALSE</td>
+<td class="gt_row gt_left" headers="dropped_trends">NA</td>
+<td class="gt_row gt_center" headers="explicitly_set">FALSE</td>
+</tr>
+</tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -1113,7 +1090,7 @@ Gentoo    -1/3    -1/2      </code></pre>
 <section id="available-contrast-schemes" class="level3">
 <h3 class="anchored" data-anchor-id="available-contrast-schemes">Available contrast schemes</h3>
 <p>Here are the different contrast functions this package currently provides.</p>
-<div class="panel-tabset">
+<div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Treatment</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Sum</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">Scaled Sum</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false">Helmert</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false">Reverse Helmert</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-6" role="tab" aria-controls="tabset-2-6" aria-selected="false">Forward Difference</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-7" role="tab" aria-controls="tabset-2-7" aria-selected="false">Backward Difference</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-8-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-8" role="tab" aria-controls="tabset-2-8" aria-selected="false">Orthogonal Polynomials</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-9-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-9" role="tab" aria-controls="tabset-2-9" aria-selected="false">Raw Polynomials</a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
@@ -1323,29 +1300,29 @@ loaded via a namespace (and not attached):
 </section>
 
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
-<div id="ref-brehm2022" class="csl-entry" role="doc-biblioentry">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-brehm2022" class="csl-entry" role="listitem">
 Brehm, Laurel, and Phillip M. Alday. 2022. <span>“Contrast Coding Choices in a Decade of Mixed Models.”</span> <em>Journal of Memory and Language</em> 125: 104334. <a href="https://doi.org/10.1016/j.jml.2022.104334">https://doi.org/10.1016/j.jml.2022.104334</a>.
 </div>
-<div id="ref-rms" class="csl-entry" role="doc-biblioentry">
+<div id="ref-rms" class="csl-entry" role="listitem">
 Harrell Jr, Frank E. 2022. <em>Rms: Regression Modeling Strategies</em>. <a href="https://CRAN.R-project.org/package=rms">https://CRAN.R-project.org/package=rms</a>.
 </div>
-<div id="ref-multcomp" class="csl-entry" role="doc-biblioentry">
+<div id="ref-multcomp" class="csl-entry" role="listitem">
 Hothorn, Torsten, Frank Bretz, and Peter Westfall. 2008. <span>“Simultaneous Inference in General Parametric Models.”</span> <em>Biometrical Journal</em> 50 (3): 346–63. <a href="https://cran.r-project.org/package=multcomp">https://cran.r-project.org/package=multcomp</a>.
 </div>
-<div id="ref-emmeans" class="csl-entry" role="doc-biblioentry">
+<div id="ref-emmeans" class="csl-entry" role="listitem">
 Lenth, Russell V. 2022. <em>Emmeans: Estimated Marginal Means, Aka Least-Squares Means</em>. <a href="https://CRAN.R-project.org/package=emmeans">https://CRAN.R-project.org/package=emmeans</a>.
 </div>
-<div id="ref-contrasts" class="csl-entry" role="doc-biblioentry">
+<div id="ref-contrasts" class="csl-entry" role="listitem">
 O’Callaghan, Alan. 2021. <em>Contrast: A Collection of Contrast Methods</em>. <a href="https://CRAN.R-project.org/package=contrast">https://CRAN.R-project.org/package=contrast</a>.
 </div>
-<div id="ref-hypr" class="csl-entry" role="doc-biblioentry">
+<div id="ref-hypr" class="csl-entry" role="listitem">
 Rabe, Maximilian M., Shravan Vasishth, Sven Hohenstein, Reinhold Kliegl, and Daniel J. Schad. 2020. <span>“Hypr: An r Package for Hypothesis-Driven Contrast Coding.”</span> <em>Journal of Open Source Software</em> 5 (48): 2134. <a href="https://doi.org/10.21105/joss.02134">https://doi.org/10.21105/joss.02134</a>.
 </div>
-<div id="ref-schad2020" class="csl-entry" role="doc-biblioentry">
+<div id="ref-schad2020" class="csl-entry" role="listitem">
 Schad, Daniel J., Shravan Vasishth, Sven Hohenstein, and Reinhold Kliegl. 2020. <span>“How to Capitalize on a Priori Contrasts in Linear (Mixed) Models: A Tutorial.”</span> <em>Journal of Memory and Language</em> 110: 104038. <a href="https://doi.org/10.1016/j.jml.2019.104038">https://doi.org/10.1016/j.jml.2019.104038</a>.
 </div>
-<div id="ref-winter2019" class="csl-entry" role="doc-biblioentry">
+<div id="ref-winter2019" class="csl-entry" role="listitem">
 Winter, Bodo. 2019. <em>Statistics for Linguists: An Introduction Using r</em>. Routledge.
 </div>
 </div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
@@ -1357,14 +1334,14 @@ Winter, Bodo. 2019. <em>Statistics for Linguists: An Introduction Using r</em>. 
 <li id="fn4"><p>Not all modeling functions use the <code>contrasts</code> argument, <code>brms::brm</code> is one example. In these cases you <em>must</em> set the contrast matrix to the factor, hence <code>set_contrasts</code> is typically more useful for the actual modeling part while <code>enlist_contrasts</code> is useful for showing matrices.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{sostarics2022,
-  author = {Thomas Sostarics},
+  author = {Sostarics, Thomas},
   title = {Contrastable},
   date = {2022-07-13},
   url = {https://tsostaricsblog.netlify.app/posts/contrastable/},
   langid = {en}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-sostarics2022" class="csl-entry quarto-appendix-citeas" role="doc-biblioentry">
-Thomas Sostarics. 2022. <span>“Contrastable.”</span> July 13, 2022. <a href="https://tsostaricsblog.netlify.app/posts/contrastable/">https://tsostaricsblog.netlify.app/posts/contrastable/</a>.
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-sostarics2022" class="csl-entry quarto-appendix-citeas" role="listitem">
+Sostarics, Thomas. 2022. <span>“Contrastable.”</span> July 13, 2022. <a href="https://tsostaricsblog.netlify.app/posts/contrastable/">https://tsostaricsblog.netlify.app/posts/contrastable/</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1508,9 +1485,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -1575,6 +1566,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -1619,8 +1696,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-      <div class="nav-footer-center">
-        <ul class="footer-items list-unstyled">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
     <li class="nav-item compact">
     <a class="nav-link" href="https://github.com/tsostarics/">
       <i class="bi bi-github" role="img" aria-label="Github">
@@ -1634,7 +1714,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </a>
   </li>  
 </ul>
-      </div>
+    </div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item">

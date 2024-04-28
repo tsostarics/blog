@@ -1,0 +1,418 @@
+---
+title: "Making inline statistics commands for LaTeX using R"
+format: html
+self-contained: true
+author: 
+ - name: Thomas Sostarics
+ - url: https://tsostarics.com/
+ - affiliation: Northwestern University Department of Linguistics
+ - orcid: 0000-0002-1178-7967
+date: '2024-04-28'
+citation:
+  url: https://tsostaricsblog.netlify.app/posts/latexswitch
+editor: source
+description: "This post discusses the behavior of Helmert contrasts."
+toc: true
+categories: ['R', 'LaTeX']
+code-tools: true
+code-fold: show
+execute: 
+  warning: false
+knitr: 
+  opts_chunk: 
+    message: false
+---
+
+In this post I describe a workflow approach for reproducible reporting of inline
+statistics for researchers who do their analysis in R but the final writeup in
+LaTeX/Overleaf without writing in RMarkdown as an intermediate step. If you are
+a diehard RMarkdown/Quarto-only fan, then this is not for you.
+If you just want to see how the final function works on Overleaf, 
+skip to the last section.
+
+If you want to use the final code that we build up here, you can download the
+source file from my github [here](https://github.com/tsostarics/sosdiss2/blob/main/R/make_latex_switch.R).
+Note that this version is slightly different than what's used here, but is
+generally equivalent in functionality.
+Also, this file is part of a larger package of convenience functions for my
+dissertation, so I'd recommend just downloading the one R file instead of
+installing the package.
+
+
+## Motivation 
+
+I've used R, RMarkdown, and Quarto documents throughout grad school and
+generally like using them for organizing my analyses and notes. But, I've been
+writing papers (and homework writeups, handouts, etc.) using LaTeX for well over
+12 years now--- since before ShareLatex merged with Overleaf. I can appreciate
+RMarkdown and Quarto's capabilities for writing articles but honestly the few
+times I've tried to stick solely with Quarto I couldn't quite reach the level of
+flexibility in PDF output that I get out the box with LaTeX.
+
+One approach I've taken in previous work was to write *just* my results/analysis
+sections using RMarkdown, then render that to a LaTeX fragment (no preamble,
+begin document, etc.) that I can `\input` into my main LaTeX document. This was
+nice because I could do tricks like using tibbles or lists to keep track of
+statistical results (see [TJ Mahr's post here with an
+example](https://tjmahr.com/lists-knitr-secret-weapon/)) and
+write functions to format and insert inline statistics like
+`$(\hat\beta=0.6, 95\% CI: [0.21,0.98])$` for me without ever needing to worry
+about handling the numbers by hand. Add a bash script to push the rendered .tex
+files to a repository, sync that with overleaf, and everything would be as it
+should be. But, this means that if I wanted to edit the results section after
+reading it in Overleaf, I would have to remember to sync my overleaf changes,
+change the RMarkdown file, rerender, then push the new .tex file again. It
+became a bit cumbersome whenever I only needed to do small prose changes that
+had nothing to do with the numbers.
+
+So here's a different approach focused on better handling the division of labor
+between prose and inline statistics, but can generalize to things like tables.
+The goal is to replicate inline R functionality in RMarkdown, where for example
+we might have our statistics in a list called `model_stats`, which we can index
+like ` r model_stats$my_effect`, assuming this would result in a number or a
+formatted inline statistics string. So, we're going to use R to create a LaTeX
+command like `\modelStats{my_effect}`, which we can then source into our LaTeX
+project The benefit here is that the only thing R exports is the numbers for the
+analysis, not the prose, so we only need to worry about occasionally updating
+our commands on the R side.
+
+I'm going to show a simple example that I've done recently that's been working
+quite well for writing my thesis. It isn't intended to necessarily work out of
+the box for every type of model, but I'll point out a couple of workarounds I
+used and some potential extensions. This command is basically just a switch
+statement.[^1] I'm basing the LaTeX implementation on the discussion from [this
+stackexchange
+post](https://tex.stackexchange.com/questions/508268/expandable-case-insensitive-switch-case-for-string-comparison),
+so give it a look if you're curious.
+
+[^1]: For those unfamiliar, a switch statement (oversimplified) is like a series
+    of multiple conditionals, so instead of writing out if x=A, B else if x=C, D
+    else if \[...\] else Z, you can write something like switch(x) A->B, C->D,
+    \[...\], Z.
+
+## The LaTeX part: Writing the command
+
+The command we're going to write looks something like the below. I'm not an
+expert on `expl3` syntax, but here's the gist of what's going on:
+
+-   Define a boolean value so we know when we've matched a coefficient
+-   Define a new command `statvalue` that takes a single argument. We need to
+    use `m` otherwise the command won't work when used inside of other commands
+    like `footnote{}`
+-   Take whatever we give to `statvalue`, `#1`, and standardize the
+    capitalization using foldcase (basically, make it all lowercase but
+    technically it's not merely lowercasing)
+-   Look through our switch cases, formatted as `{ matchtext } { result }`. If
+    `#1` matches with `matchtext`, then we flag that we found a match by setting
+    our boolean `found` to true, then return the rest of the result (formatted
+    text).
+-   If we don't find a match, then `found` is still false, so we'll return ERROR
+    in big red letters so we can see it in the rendered text.
+
+```{latex}   
+\ExplSyntaxOn
+\newboolean{found}
+\setboolean{found}{false}
+\NewDocumentCommand \statvalue{ m }
+{
+\str_case_e:nn { \str_foldcase:e { #1 } }
+{
+{ groupTreatment } { \setboolean{found}{true} $(\hat\beta = 0.79, CI=[0.58,0.99]), p<.001$ }
+{ age } { \setboolean{found}{true} $(\hat\beta = 0.09, CI=[-0.21,0.15]), p<.001$ }
+}
+\ifthenelse{\boolean{found}}{}{{\color{red} \large ERROR}}
+\setboolean{found}{false}
+}
+\cs_generate_variant:Nn \str_foldcase:n { e }
+\ExplSyntaxOff
+```
+
+So then we can write text like:
+
+```         
+We find a credible effect of group \statvalue{groupTreatment} such 
+that the treatment group has higher levels of (whatever).
+There was no significant effect of age \statvalue{age}.
+```
+
+Which then is replaced under the hood with:
+
+```         
+We find a significant effect of group $(\hat\beta = 0.79, CI=[0.58,0.99], p<.001)$ such 
+that the treatment group has higher levels of (whatever).
+There was no significant effect of age $(\hat\beta = 0.09, CI=[-0.21,0.15], p=.63)$.
+```
+
+So, our work on the R front has two parts. First, we need the boilerplate for
+the command. Second, we need to format our model results as a string and then
+inject it into the boilerplate.
+
+## The R part 1: Getting the modeling results ready
+
+First I'll fit a very simple mixed model, I'll ignore the singularity warning
+since this is just an example so we have something to work with.
+
+```{r}
+library(palmerpenguins) # For dataset
+library(lme4)           # For mixed models
+library(lmerTest)       # For p value output
+
+penguin_model <- 
+  lmer(bill_length_mm ~ bill_depth_mm * species  + (1|island), 
+       data = palmerpenguins::penguins)
+
+summary(penguin_model)
+```
+
+Hurray, lots of p<.05, time to publish[^thisisajoke] In our results section
+we'll report on the effect estimate $\hat\beta$, the 95% confidence interval,
+and the $p$ value, but we need to format all this information in a consistent
+way. We can always add more information as needed (e.g., if a reviewer says they
+want the $t$ value reported inline as well). We'll use `broom.mixed::tidy` to
+get just our fixed effect estimates, and then I'll do some quick rounding and
+post processing of the p values.
+
+[^thisisajoke]: This is a joke if it isn't obvious.
+
+```{r}
+library(broom.mixed)
+library(dplyr)
+
+model_results <- 
+  penguin_model |> 
+  tidy(effects='fixed', conf.int = TRUE) |> 
+  dplyr::mutate(p.value = scales::pvalue(p.value,accuracy = .01,add_p = TRUE),
+                across(where(is.numeric), ~round(.,2)),)
+
+model_results
+```
+
+Now, we need to modify the terms a bit to make them more amenable to the pattern
+matching for the LaTeX command. Specifically, we'll need to lowercase everything
+and change the `:` character to something else. Since `i` is used for
+interactions, I'll change it to `i`. Looking ahead, we'll also drop the
+parentheses for the intercept since it looks weird to write
+`\stavalue{(intercept)}`.
+
+```{r}
+model_results <- mutate(model_results,
+                        term = tolower(term),
+                        term = gsub(":", "i", term),
+                        term = gsub("[)(]", "", term))
+
+model_results$term
+```
+
+We can wrap all these steps into a function to use with other models later on:
+
+```{r}
+
+process_coefs <- function(mdl) {
+  mdl |> 
+    broom.mixed::tidy(effects='fixed', conf.int = TRUE) |> 
+    dplyr::mutate(p.value = scales::pvalue(p.value,accuracy = .01,add_p = TRUE),
+                  across(where(is.numeric), ~round(.,2)),
+                  term = tolower(term),
+                  term = gsub(":", "i", term),
+                  term = gsub("[)(]", "", term))
+}
+```
+
+## The R part 2: Writing the boilerplate command
+
+What we want is a function that takes our model results dataframe and spits out
+a formatted LaTeX command. If we think we might have more than 1 model to
+report, we're going to need parameters to name the command and a boolean to omit
+the `found` boolean.[^2] We'll also add a parameter for the formatted inline
+stats strings, in case we need to modify what/how we report at a later point.
+This will get injected into the case boilerplate. Here is the pseudocode for the
+function in case you want to think or work through the steps yourself.
+
+[^2]: The boolean value only needs to be defined once in the document, so we
+    want to include it for our first command but not redefine it multiple times,
+    as this will throw an error in LaTeX.
+
+```{r}
+#| echo: true
+#| eval: false
+
+make_latex_switch <- 
+  function(model_coef_df,
+           fstring = r"($(\hat\beta = {estimate}, CI=[{conf.low},{conf.high}])$)",
+           command_name = "statvalue",
+           add_found_boolean = TRUE) {
+    
+    # Set up the start of the command with the expl3 lines
+    
+    # Check whether we need to add the found boolean
+    
+    # Set up the first couple of lines
+    
+    
+    # Take the formatted string from the user and embed it within the syntax
+    # needed for the conditional statements
+    
+    # Take the full formatted string and inject the model values
+    
+    # Add together all the lines, along with the ending parts to close off the
+    # command definition
+    
+    # Print the new expression with the newlines in a copy-pasteable format
+    
+    # Return the lines as a character vector in case the user wants to hold on
+    # to them (which is reasonable)
+  }
+
+```
+
+And here is the function filled out.[^growingnote] Note that there are of
+course other ways to implement this. For example, we might create a named list
+of formatted strings outside of this function then iterate over the names and
+values of that list to inject them into the boilerplate.
+
+[^growingnote]: Yes yes I know we're growing a vector, let's set that issue
+aside for the time being. One could imagine a different implementation where the
+entire boilerplate is created beforehand and only joined with the model lines at
+the end. Performance is not a huge issue for this kind of thing unless you're
+trying to make thousands of commands in bulk, in which case you probably have
+other more serious problems to deal with.
+
+```{r}
+make_latex_switch <- 
+  function(model_coef_df,
+           command_name = "statvalue",
+           fstring = r"($(\hat\beta = {estimate}, CI=[{conf.low},{conf.high}], {p.value})$)",
+           add_found_boolean = TRUE) {
+    
+    # Set up the start of the command with the expl3 lines
+    starting_lines <- c(r"(\ExplSyntaxOn)")
+    
+    # Base case is handled by a boolean called "found", if we have already defined
+    # this elsewhere then we can omit it as needed
+    if (add_found_boolean)
+      starting_lines <- c(starting_lines, r"(\newboolean{found})")
+    
+    starting_lines <-
+      c(
+        starting_lines,
+        r"(\setboolean{found}{false})",
+        paste0(r"(\NewDocumentCommand \)", command_name, r"({ m })"), 
+        r"(  {)",
+        r"(    \str_case_e:nn { \str_foldcase:e { #1 } })",
+        r"(      {)")
+    
+    
+    # Take the formatted string from the user and embed it within the syntax
+    # needed for the conditional statements
+    fstring <- 
+      paste0(
+        "        {{ {term} }} {{ \\setboolean{{found}}{{true}} ", fstring, " }}"
+      )
+    
+    # Take the full formatted string and inject the model values
+    mdl_lines <- glue::glue(fstring, .envir = model_coef_df)
+    
+    # Add together all the lines, along with the ending parts to close off the
+    # command definition
+    all_lines <-
+      c(starting_lines,
+        mdl_lines,
+        r"(      })",
+        r"(    \ifthenelse{\boolean{found}}{}{{\color{red} \large ERROR}})",
+        r"(    \setboolean{found}{false})",
+        r"(  })",
+        r"(\cs_generate_variant:Nn \str_foldcase:n { e })",
+        r"(\ExplSyntaxOff)") |>
+      paste0("\n") # add newlines for formatting
+    
+    # Print the new expression with the newlines in a copy-pasteable format
+    cat(all_lines)
+    
+    # Return the lines as a character vector in case the user wants to hold on
+    # to them (which is reasonable)
+    invisible(all_lines)
+  }
+```
+
+## The integration part
+
+So now we have our function and model results, let's make some commands.
+
+```{r}
+penguin_model |> 
+process_coefs() |> 
+  make_latex_switch("statValue")
+```
+
+We can take the output of this and just copy paste it into our preamble on
+overleaf like in the below picture. Note that we need to include the `xparse`
+and `ifthen` packages (if one of your packages doesn't already include them). We
+can ignore the error that overleaf flags on line 23, it's just because of the
+expl3 syntax.
+
+![](img2.png)
+
+Then we can type our LaTeX writeup and render it like so:
+
+![](img1.png)
+
+If we have multiple models, then we might want to write a new tex file that we
+can source into the project instead:
+
+```{r}
+#| eval: false
+mdl2 <- lmer(flipper_length_mm ~ body_mass_g + (1|species), 
+             data = palmerpenguins::penguins)
+mdl3 <- lmer(bill_depth_mm ~ body_mass_g*bill_length_mm + (1|sex) + (1|species), 
+             data = palmerpenguins::penguins)
+switch1 <- make_latex_switch(process_coefs(penguin_model), "statValue")
+switch2 <- make_latex_switch(process_coefs(mdl2), "flipperModelValue",add_found_boolean = FALSE)
+switch3 <- make_latex_switch(process_coefs(mdl3), "depthModelValue",add_found_boolean = FALSE)
+
+c(switch1, switch2, switch3) |> 
+  writeLines("inlinestats.tex", sep = "")
+
+```
+
+Then we can add that tex file to our overleaf project and clean up our preamble
+accordingly:
+
+![](img3.png)
+
+Full document code below:
+
+```{latex}
+\documentclass[]{article}
+\usepackage{xcolor} % for color
+\usepackage{xparse} % for expl3 syntax
+\usepackage{ifthen} % for boolean checks
+
+\input{inlinestats}
+
+\begin{document}
+We find a significant conditional effect of bill depth for Adelie penguins \statValue{bill_depth_mm} such that bill length is positively associated with bill depth.
+There is not a significant difference between the average bill lengths for chinstrap penguins \statValue{specieschinstrap} nor gentoo penguins \statValue{speciesgentoo} compared to Adelie penguins.
+However, there are positive interactions suggesting higher magnitude associations between bill length and depth for both Chinstrap \statValue{bill_depth_mmispecieschinstrap} and Gentoo penguins \statValue{bill_depth_mmispeciesgentoo}.
+
+Something something \flipperModelValue{intercept}, something something \depthModelValue{bill_length_mm}.
+\end{document}
+```
+
+### Some extensions
+
+Obviously this was just a simple implementation, but you can extend either the
+R-side processing/formatting or LaTeX-side command as needed.
+For example, if you have a cumulative link model fit with brms, the threshold
+coefficients will look like `intercept[1]`, so you might want to adjust these
+to something like `theta1` or `intercept1`.
+Also, you might want to add some error handling to the `make_latex_switch`
+function to make sure the command name you use is wellformed.
+
+On the LaTeX side, I'm really not very familiar with using expl3 so I don't have
+an idea about how it might interact with other packages, affect compile times,
+etc.
+
+```{r}
+sessionInfo()
+```
+
