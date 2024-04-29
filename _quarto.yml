@@ -2,6 +2,7 @@ project:
   type: website
 
 website:
+  google-analytics: "G-Z9YCP78E1T"
   navbar:
     title: false
     collapse-below: sm
