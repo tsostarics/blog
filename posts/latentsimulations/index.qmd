@@ -1,0 +1,403 @@
+---
+title: "Some latent variable simulations"
+format: html
+self-contained: true
+author: 
+ - name: Thomas Sostarics
+ - url: https://tsostarics.com/
+ - affiliation: Northwestern University Department of Linguistics
+ - orcid: 0000-0002-1178-7967
+date: '2024-07-22'
+citation:
+  url: https://tsostaricsblog.netlify.app/posts/latentsimulations
+editor: source
+description: "This post looks at the relationship between continuous predictors, latent variables, and predicted ordinal ratings."
+toc: true
+categories: ['R']
+code-tools: true
+code-fold: show
+knitr: 
+  opts_chunk: 
+    message: false
+    warning: false
+---
+
+I found myself second guessing myself about the relationship between
+thresholds, a predictor variable $x$, and a latent variable $Y*$ in cumulative 
+link models.
+So, I ran some simulations to double check that thresholds partition values of
+$Y*$, but this doesn't translate to partitioning values of $x$.
+A lot of the things here are stated formally already in McCullagh's 1980 paper
+and Agresti's 2010 textbook, so the simulations are just to convince myself.
+
+## Setup
+
+```{r}
+library(ordinal)
+library(tidyverse)
+
+plot_theme <-
+  list(
+    scale_color_brewer(palette = "Dark2"),
+    theme_bw(base_size = 16),
+    theme(panel.grid = element_line(linewidth = .3))
+  )
+```
+
+Helpers to work with threshold values.
+
+```{r}
+# Get probabilities for k ratings given k-1 threshold values
+get_rating_probabilities <- function(thetas) {
+  c(plogis(thetas[1]), diff(c(plogis(thetas), 1)))
+  
+}
+
+# Multinomial sampling given threshold allocations
+sample_ratings <- function(x, thresholds, size = 50, B = 1.25) {
+  probs <- get_rating_probabilities(thresholds - B*x)
+  rmultinom(1, size, probs)[,1]
+}
+```
+
+Set up some hyperparameters for the simulations, we'll use a single continuous variable `x`.
+
+```{r}
+xvals <- seq(-4,4, by = .01)
+thetas <- c(-1.5,0,.9)
+n_points <- 400
+```
+
+## The simulations
+
+Below we simulate a bunch of ratings at each value of `x`, then wrangle that
+into a long dataframe of rating observations.
+
+```{r}
+set.seed(111)
+
+# Simulate n_points observations at each value of x
+raw_data <-
+  data.frame(
+    x = rep(xvals, each = 4),
+    rating = ordered(rep(1:4, times = length(xvals))),
+    response_count = 
+      c(
+        lapply(xvals, \(x) sample_ratings(x, thetas, size = n_points)), 
+        recursive = TRUE
+      )
+  )
+
+# Convert counts to individual observations
+response_data <- 
+  raw_data |>
+  reframe(.by = c('x', 'rating', 'response_count'),
+          response = seq_len(response_count[1]))
+```
+
+Below we can see what the proportion of ratings are for each value of `x`.
+
+```{r}
+raw_data |> 
+  mutate(prop = response_count / n_points) |>
+  ggplot(aes(x = x, y = prop, color = rating)) +
+  geom_line() +
+  plot_theme
+```
+
+Let's model this using a simple clm.
+
+```{r}
+simulated_mdl <- clm(rating ~ x, data = response_data)
+```
+
+We can extract the predictions for each value of `x`.
+There are different predictions we can get:
+
+- The predicted probability of each rating given `x`
+- The predicted rating given `x`
+- The predicted cumulative probabilities up to each rating category given `x`
+- The log odds of the cumulative probabilities up to each rating category
+given `x` (i.e., the linear combination of predictors given the thresholds,
+coefficient estimates, and `x`)
+
+I'm only going to focus on the first three, as the linear predictors are
+directly related to the cumulative probabilities via the link function.
+
+```{r}
+prob_preds <-
+  cbind(x = xvals, 
+        predict(simulated_mdl, data.frame(x = xvals), type = "prob")$fit)
+rating_preds <-
+  cbind(x = xvals, 
+        predict(simulated_mdl, data.frame(x = xvals), type = "class")$fit) |>
+  as.data.frame()
+cumprob_preds <-
+  cbind(x = xvals, 
+        predict(simulated_mdl, data.frame(x = xvals), type = "cum.prob")$cprob1)
+
+```
+
+Wrangle the more complicated ones into dataframes:
+
+```{r}
+probs_df <-
+  prob_preds |>
+  as.data.frame() |>
+  pivot_longer(cols = 2:5,
+               names_to = "rating",
+               values_to = "prob")
+
+cumprob_df <-
+  cumprob_preds |>
+  as.data.frame() |>
+  pivot_longer(cols = 2:5,
+               names_to = "rating",
+               values_to = "prob")
+```
+
+### Simulation results
+
+We can plot the predicted probabilities of each rating along with what the
+predicted rating is for each value of `x`.
+Note that the predicted rating $Y$ is going to be the rating that has the 
+highest probability.
+Here are the predictions; the discrete rating is shown by a black line.
+
+```{r}
+probs_df |>
+  ggplot(aes(x = x, y = prob, group = rating, color = rating)) +
+  geom_line() +
+  geom_line(data = rating_preds,
+            aes(x = x, y = as.numeric(V2)/4),
+            color = "black",
+            inherit.aes = FALSE)+
+  plot_theme
+```
+
+Here are the predictions superimposed on top of our empirical proportions;
+good fit! (we'd be in trouble if it wasn't)
+
+```{r}
+
+raw_data |> 
+  mutate(prop = response_count / n_points) |>
+  ggplot(aes(x = x, y = prop, color = rating, group = rating)) +
+  geom_line(alpha = .5) +
+  geom_line(data = probs_df,
+            aes(y = prob),
+            color = 'white',
+            linewidth = 2)+
+  geom_line(data = probs_df,
+            aes(y = prob),
+            linewidth = 1)+
+  geom_line(data = rating_preds,
+            aes(x = x, y = as.numeric(V2)/4),
+            color = "black",
+            inherit.aes = FALSE)+
+  plot_theme
+```
+
+Note that the points at which the observed rating changes (where the black
+line goes up) is not equal to the threshold values:
+
+```{r}
+plot_thetas <- function(scale = FALSE, 
+                        color = 'red', 
+                        linetype = 'dashed', 
+                        model = simulated_mdl) {
+  thetas <- model$Theta
+  
+  if (scale)
+    thetas <- thetas / model$coefficients['x']
+  
+  lapply(
+    thetas, 
+    \(t) geom_vline(xintercept = t, color = color, linetype = linetype)
+  )
+}
+
+probs_df |>
+  ggplot(aes(x = x, y = prob, group = rating, color = rating)) +
+  geom_line() +
+  geom_line(data = rating_preds,
+            aes(x = x, y = as.numeric(V2)/4),
+            color = "black",
+            inherit.aes = FALSE)+
+  plot_thetas() +
+  plot_theme
+```
+
+Rather, the thresholds are related to where the cumulative probabilities up to
+a given rating category is 50\%.
+We can work this out analytically.
+Assuming a logit link function, 50\% corresponds to a logit of 0.
+
+\begin{align*}
+\text{logit}[P(y\leq j)]&=\theta_j - \beta*x \\
+0 &= \theta_j - \beta*x \\
+x &= \frac{\theta_j}{\beta}
+\end{align*}
+
+Again, this is not the value of `x` at which a specific rating is predicted,
+but the value of `x` at which the cumulative probability given a particular
+rating category $j$ is equal to 50\%.
+Below, the threshold values are plotted in gray dotted lines and the transformed
+values for finding where the cumulative probabilities are equal to 50\% are
+plotted in red.
+
+```{r}
+cumprob_df |>
+  ggplot(aes(x = x, y = prob, group = rating, color = rating)) +
+  geom_line() +
+  plot_thetas(scale=FALSE, "gray20", "dotted") +
+  plot_thetas(scale=TRUE) +
+  geom_line(data = rating_preds,
+            aes(x = x, y = as.numeric(V2)/4),
+            color = "black",
+            inherit.aes = FALSE) +
+  plot_theme +
+  ylab("P(Y<=j)")
+```
+
+Taking the first curve as an example, we can say that at (just past) the first
+transformed threshold, the probability of a 1 is less than the probability of a rating
+higher than 1 (=2,3,4).
+But, the individual probability of a 1 can be higher than the individual
+probabilities of a 2, 3, or 4 response.
+Somewhat relatedly, for the third curve at the third transformed threshold, we can see that
+the probability of a 1, 2, or 3 response becomes less likely than a 4 response.
+But by the time we subtract out the likelihood of a 1 or 2, then the likelihood
+of a 1, we find that the individual probability of a 3 is never higher than
+the individual probabilities of a 1, 2, or 4 rating.
+Hence, we never predict a rating of 3 for any value of `x`.
+
+Where did all our 3s go??
+Because $Y=3$ is never the *most likely* rating, it isn't predicted given values
+of `x`.
+If we're supposed to get a value of 3 whenever a value of $Y*$ falls between
+$\theta_{2|3}$ and $\theta_{3|4}$, then how is `x` related to $Y*$?
+Here, `x` affects the distribution of $Y*$ values via shifting its location.
+In other words, $Y*$ is taken to vary about a location $\eta$, which in the
+context of our model depends on `x` via  $\beta x$, i.e., $\eta(x)=\beta x$.
+
+How is $Y*$ distributed?
+Given our link function, it'll be a logistic distribution.
+So, we can sample values of $Y*$ from a logistic distribution at different
+values of $x$, then use our thresholds to categorize the sampled values of $Y*$
+and obtain ratings $Y$.
+By doing so, we can reintroduce some 3s, which we know should be possible in a
+probabilistic sense.
+In the process, we'll also simulate a new dataset that should match our previous
+predicted probabilities (and in turn our empirical proportions).
+
+
+```{r}
+# Helper to categorize values of Y* to get ratings Y
+ystar_to_y <- function(ystar, thresholds = simulated_mdl$Theta[1,]) {
+  indices <- seq_along(thresholds)
+  max_val <- length(thresholds)+1L
+  vapply(ystar, \(y) {
+    for (i in indices) {
+      if (y < thresholds[i])
+        return (i)
+    }
+    max_val
+  }, 1L)
+}
+
+# Sample Y* values at values of x given the model's estimated coefficient
+sample_ystar <- function(x, n_ratings = n_points, model = simulated_mdl){
+  b <- model$coefficients['x']
+  
+  rlogis(n_ratings, location = b*x) # Not negated here
+}
+
+# Helper to sample multiple ratings for a given value of x
+sample_rating_from_model <- function(x, n_ratings = n_points, model = simulated_mdl){
+  ystar_values <- sample_ystar(x, n_ratings, model)
+  
+  ystar_to_y(ystar_values)
+}
+
+# Sample Y* values and plot
+set.seed(111)
+sample_data <- 
+  data.frame(x = rep(xvals, each = n_points),
+             rating = c(lapply(xvals,sample_rating_from_model),recursive=TRUE))
+
+sample_data |> 
+  mutate(rating = ordered(rating)) |> 
+  group_by(x, rating) |> 
+  summarize(response_count = n(),
+            prob = response_count / n_points) |> 
+  ggplot(aes(x = x, y = prob, color = rating, group = rating)) +
+  geom_line() +
+  plot_theme
+```
+
+Compare this to the empirical data we plotted at the beginning.
+It looks the same!
+We sampled values in 2 different ways: once through multinomial sampling of
+discrete values of $Y$ given fixed response probabilities (derived from fixed
+thresholds) and values of x, and once through sampling continuous values of $Y*$
+from a logistic distribution then categorizing the sampled results to get
+discrete ratings (following a latent variable motivation for the CLM).
+
+We can also look at the distribution of $Y*$ values at a few values of `x`.
+Plotted are the probability density curves scaled to the number of sampled
+points and a histogram of $Y*$ values with the thresholds shown in red.
+
+```{r}
+set.seed(111)
+test_x_vals <- c(-3, -.5, 1, 2.5)
+ystar_dist_df <- 
+  data.frame(x = rep(test_x_vals, each = n_points),
+             ystar = c(lapply(test_x_vals,sample_ystar),recursive=TRUE))
+
+beta <- simulated_mdl$coefficients['x']
+locations <- summarize(ystar_dist_df,
+          .by = 'x') |> 
+  mutate(beta_x = beta * x)
+
+ystar_dist_df |> 
+  ggplot(aes(x = ystar)) +
+  geom_histogram() +
+  plot_thetas(FALSE) +
+  lapply(test_x_vals, 
+         \(l) 
+         geom_line(data=data.frame(xvals = seq(-10,10,.1),
+                              x = l,
+                              y = dlogis(seq(-10,10,.1),location = beta*l)*n_points),
+                   aes(x = xvals, y = y, group = x)))+
+  facet_grid(x~.) +
+  plot_theme
+```
+
+## Conclusions
+
+Here are the take homes based on the simulations.
+First, the thresholds $\theta_j$ shows how the values of $Y*$ are
+categorized into discrete rating categories $Y$.
+In other words, the distribution of $Y*$ is partitioned by the thresholds.
+However, the $Y*$ values are distributed about a location parameter that depends
+on `x`, for our simple model this is just $\beta x$.
+The threshold values can be scaled by $\beta$ to identify the values of `x` at
+which different cumulative probabilities are equal to 50\%.
+But these values do not necessarily correspond to the points at which the
+predicted ratings $Y$ change.
+This is because the individual probability of one response category may be less
+likely than the *sum* of the individual probabilities of each higher rating
+while still being the most likely *individual* response category.
+We can nonetheless recover the estimated proportions of each rating category
+by sampling from the link function's distribution conditioned on a value of `x`.
+
+So, values of $Y*$ increase in categorized value $Y$ when 
+surpassing a threshold.
+If we use a continuous predictor, then we should be able to identify a region
+at which we pass from one rating to another.
+But, we noted that there was no region at which we got 3s.
+This arises because `x` is related to the distribution of $Y*$ values, but the
+predicted value $Y$ depends on considering the allocation of probability given
+all of the thresholds and choosing the value with the highest probability, which
+is not guaranteed to be an infrequent response category.

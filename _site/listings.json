@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/latentsimulations/index.html",
       "/posts/latexswitch/index.html",
       "/posts/notefreqs/index.html",
       "/posts/helmert/index.html",
