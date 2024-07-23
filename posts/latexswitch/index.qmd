@@ -11,8 +11,9 @@ date: '2024-04-28'
 citation:
   url: https://tsostaricsblog.netlify.app/posts/latexswitch
 editor: source
-description: "This post discusses the behavior of Helmert contrasts."
+description: "This post shows how to make latex commands to insert model statistics."
 toc: true
+image: false
 categories: ['R', 'LaTeX']
 code-tools: true
 code-fold: show
