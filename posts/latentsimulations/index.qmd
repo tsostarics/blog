@@ -98,6 +98,7 @@ response_data <-
 Below we can see what the proportion of ratings are for each value of `x`.
 
 ```{r}
+#| classes: preview-image
 raw_data |> 
   mutate(prop = response_count / n_points) |>
   ggplot(aes(x = x, y = prop, color = rating)) +
